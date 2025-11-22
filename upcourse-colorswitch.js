@@ -28,7 +28,7 @@
     SNAPSHOT
     -------------------------------------------- */
 
-    function xxxsnapshotStyles(targetMap) {
+    function snapshotStyles(targetMap) {
         elementsCache.forEach((el) => {
             const cs = getComputedStyle(el);
             targetMap.set(el, {
@@ -44,7 +44,7 @@
     APPLY SNAPSHOT
     -------------------------------------------- */
 
-    function xxxapplySnapshot(snapshotMap) {
+    function applySnapshot(snapshotMap) {
         elementsCache.forEach((el) => {
             const saved = snapshotMap.get(el);
             if (!saved) return;
