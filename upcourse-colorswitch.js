@@ -168,46 +168,7 @@
 
         if (placeholder) {
             placeholder.replaceWith(bar);
-
-            // VISUAL DEBUG: tonen dat placeholder-pad gebruikt wordt
-            const msg = document.createElement("div");
-            msg.textContent = "placeholder OK";
-            msg.style.cssText = `
-        position: fixed;
-        bottom: 10px;
-        right: 10px;
-        background: #2ecc71;
-        color: #fff;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        z-index: 999999999;
-    `;
-            document.body.appendChild(msg);
-            setTimeout(() => msg.remove(), 2500);
-
-        } else {
-
-            document.body.prepend(bar);
-
-            // VISUAL DEBUG: tonen dat fallback-pad gebruikt wordt
-            const msg = document.createElement("div");
-            msg.textContent = "placeholder NOT found (fallback)";
-            msg.style.cssText = `
-        position: fixed;
-        bottom: 10px;
-        right: 10px;
-        background: #e74c3c;
-        color: #fff;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        z-index: 999999999;
-    `;
-            document.body.appendChild(msg);
-            setTimeout(() => msg.remove(), 2500);
         }
-
 
         /* ---- NEW PURE-DIV SWITCH ---- */
         const switchEl = bar.querySelector("#jiffy_switch");
