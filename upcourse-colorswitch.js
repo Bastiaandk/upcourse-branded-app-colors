@@ -138,25 +138,7 @@
         document.head.appendChild(style);
     }
 
-    function injectToggleHTML(forcedMode) {
-        const bar = document.createElement('div');
-        bar.id = 'jiffy_toggle_bar';
 
-        const emoji = forcedMode === 'dark' ? '☾' : '𖤓';
-
-        bar.innerHTML = `
-            <div id="xxxjiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">debug-v5-🎨</span>
-                <label id="jiffy_switch">
-                    <input type="checkbox" id="jiffy_mode_toggle" />
-                    <span class="slider"></span>
-                </label>
-                <span id="emoji_right" style="font-size:22px;">${emoji}</span>
-            </div>
-        `;
-
-        return bar;
-    }
 
     function initToggleBar(forcedMode) {
         injectToggleCSS();
