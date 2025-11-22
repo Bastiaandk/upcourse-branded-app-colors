@@ -1,7 +1,7 @@
 (function () {
 
     /* --------------------------------------------
-    CSS (origineel)
+    CSS (origineel, maar slider is eerst hidden)
     -------------------------------------------- */
     function injectToggleCSS() {
         const css = `
@@ -41,6 +41,7 @@
             background: #444;
             border-radius: 50%;
             transition: transform 0.25s ease;
+            visibility: hidden; /* FASE 1 FIX */
         }
 
         #jiffy_switch.active .slider {
@@ -53,23 +54,21 @@
     }
 
     /* --------------------------------------------
-    HTML (origineel)
+    HTML BAR
     -------------------------------------------- */
-    function injectToggleHTML(forcedMode) {
+    function injectToggleHTML() {
         const bar = document.createElement("div");
         bar.id = "jiffy_toggle_bar";
 
-        const emoji = forcedMode === "dark" ? "☾" : "𖤓";
-
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 1 🎨</span>
+                <span style="font-size:22px;">debug 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch">
-                    <div class="slider"></div>
+                    <div class="slider"></div> 
                 </div>
 
-                <span style="font-size:22px;">${emoji}</span>
+                <span style="font-size:22px;">☾</span>
             </div>
         `;
 
@@ -122,13 +121,12 @@
     }
 
     /* --------------------------------------------
-    INIT BAR — originele timing + sliderfix
+    PHASE 1 — EARLY BAR (NO SLIDER FUNCTIONALITY)
     -------------------------------------------- */
-    function initToggleBar(forcedMode) {
-
+    function initBarEarly() {
         injectToggleCSS();
 
-        const bar = injectToggleHTML(forcedMode);
+        const bar = injectToggleHTML();
         const placeholder = document.getElementById("jiffy_bar_placeholder");
 
         if (placeholder) {
@@ -137,11 +135,42 @@
             document.body.prepend(bar);
         }
 
+        requestAnimationFrame(() => {
+            bar.style.opacity = 1;
+        });
+
+        return bar;
+    }
+
+    /* --------------------------------------------
+    PHASE 2 — LATE SLIDER ACTIVATION (NO SCROLL JUMP)
+    -------------------------------------------- */
+    function activateSlider(bar) {
+
         const switchEl = bar.querySelector("#jiffy_switch");
+        const slider = bar.querySelector(".slider");
+
+        // make slider visible AFTER hydration
+        slider.style.visibility = "visible";
+
+        // determine forcedMode
+        const bodyStyles = getComputedStyle(document.body);
+        const currentBg = bodyStyles.backgroundColor.trim();
+        const forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
+
+        // tint slider (original behaviour)
+        if (forcedMode === "light") {
+            slider.style.background = "#f9f9f9";
+            slider.style.borderColor = "#ccc";
+        }
+
+        // start active like original
         switchEl.classList.add("active");
 
+        // restore full toggle logic
         switchEl.addEventListener("click", () => {
             switchEl.classList.toggle("active");
+
             const isOn = switchEl.classList.contains("active");
 
             if (isOn) {
@@ -150,45 +179,27 @@
                 applySnapshot(originalStyles);
             }
         });
-
-        /* --------------------------------------------
-           SLIDER FIX — origineel gedrag precies hersteld
-        -------------------------------------------- */
-        if (forcedMode === "light") {
-            const slider = bar.querySelector(".slider");
-            if (slider) {
-                slider.style.background = "#f9f9f9";
-                slider.style.borderColor = "#ccc";
-            }
-        }
-
-        requestAnimationFrame(() => {
-            bar.style.opacity = 1;
-        });
     }
 
     /* --------------------------------------------
-    INIT — ORIGINELE TIJD TERUG
+    INIT
     -------------------------------------------- */
     document.addEventListener("DOMContentLoaded", () => {
 
-        elementsCache = Array.from(document.querySelectorAll(SELECTOR_LIST));
+        // phase 1: early bar
+        const bar = initBarEarly();
 
+        elementsCache = Array.from(document.querySelectorAll(SELECTOR_LIST));
         snapshotStyles(originalStyles);
 
-        /* ★ DE CRUCIALE FIX ★  
-           WACHT LAAT GENOEG DAT KAJABI UITGEHYDRATE IS */
+        // Wait for Kajabi hydration to finish
+        // to avoid scroll bugs and slider invisibility
         setTimeout(() => {
 
             snapshotStyles(forcedStyles);
+            activateSlider(bar);
 
-            const bodyStyles = getComputedStyle(document.body);
-            const currentBg = bodyStyles.backgroundColor.trim();
-            const forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
-
-            initToggleBar(forcedMode);
-
-        }, 1000); // ← DEZE timing maakte jouw slider zichtbaar
+        }, 1000); // ← exact timing required
     });
 
 })();
