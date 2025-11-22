@@ -93,7 +93,6 @@
         }
 
 #jiffy_toggle_bar {
-    position: static;
     width: 100%;
     padding: 5px 0;
     background: #111;
@@ -160,7 +159,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">debug-v2-🎨</span>
+                <span id="emoji_left" style="font-size:22px;">debug-v3-🎨</span>
                 <label id="jiffy_switch">
                     <input type="checkbox" id="jiffy_mode_toggle" />
                     <span class="slider"></span>
