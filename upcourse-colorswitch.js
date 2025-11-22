@@ -11,11 +11,12 @@
         'img,button,label,[style]';
 
     const VIDEO_SELECTOR =
-        '.block-type--video, .block-type--video *,' + '.block-type--gamify_video, .block-type--gamify_video *';
+        '.block-type--video, .block-type--video *,' +
+        '.block-type--gamify_video, .block-type--gamify_video *';
 
     /* --------------------------------------------
-     STORAGE
-  -------------------------------------------- */
+    STORAGE
+    -------------------------------------------- */
 
     const originalStyles = new WeakMap();
     const forcedStyles = new WeakMap();
@@ -24,8 +25,8 @@
     let elementsCache = [];
 
     /* --------------------------------------------
-     SNAPSHOT
-  -------------------------------------------- */
+    SNAPSHOT
+    -------------------------------------------- */
 
     function snapshotStyles(targetMap) {
         elementsCache.forEach((el) => {
@@ -40,8 +41,8 @@
     }
 
     /* --------------------------------------------
-     APPLY SNAPSHOT
-  -------------------------------------------- */
+    APPLY SNAPSHOT
+    -------------------------------------------- */
 
     function applySnapshot(snapshotMap) {
         elementsCache.forEach((el) => {
@@ -63,8 +64,8 @@
     }
 
     /* --------------------------------------------
-     VIDEO FIX
-  -------------------------------------------- */
+    VIDEO FIX
+    -------------------------------------------- */
 
     function fixVideoBackgrounds() {
         document.querySelectorAll(VIDEO_SELECTOR).forEach((el) => {
@@ -74,67 +75,69 @@
     }
 
     /* --------------------------------------------
-     TOGGLE UI
-  -------------------------------------------- */
+    TOGGLE UI
+    -------------------------------------------- */
+
     function injectToggleCSS() {
         const css = `
-    #jiffy_toggle_bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: #111;
-    padding: 5px 0;
-    z-index: 999999999;
-    display: block;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    }
-    #jiffy_toggle_inner {
-        display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    width: 100%;
-    }
-    #jiffy_switch {
-        position: relative;
-    width: 60px;
-    height: 30px;
-    display: inline-block;
-    }
-    #jiffy_switch input {
-        position: absolute;
-    height: 30px;
-    width: 60px;
-    opacity: 0;
-    cursor: pointer;
-    z-index: 3;
-    }
-    #jiffy_switch .slider {
-        position: absolute;
-    width: 60px;
-    height: 30px;
-    background: #111;
-    border: 2px solid #444;
-    border-radius: 20px;
-    z-index: 1;
-    }
-    #jiffy_switch .slider::before {
-        content: "";
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 22px;
-    height: 22px;
-    background: #444;
-    border-radius: 50%;
-    transition: transform 0.25s ease;
-    }
-    #jiffy_switch input:checked + .slider::before {
-        transform: translateX(28px);
-    }
-    `;
+        #jiffy_toggle_bar {
+            /* Initial safe state to prevent scroll blocking */
+            position: absolute;
+            top: -9999px;
+            left: 0;
+            width: 100%;
+            background: #111;
+            padding: 5px 0;
+            z-index: 999999999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        #jiffy_toggle_inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            width: 100%;
+        }
+        #jiffy_switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            display: inline-block;
+        }
+        #jiffy_switch input {
+            position: absolute;
+            height: 30px;
+            width: 60px;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 3;
+        }
+        #jiffy_switch .slider {
+            position: absolute;
+            width: 60px;
+            height: 30px;
+            background: #111;
+            border: 2px solid #444;
+            border-radius: 20px;
+            z-index: 1;
+        }
+        #jiffy_switch .slider::before {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: #444;
+            border-radius: 50%;
+            transition: transform 0.25s ease;
+        }
+        #jiffy_switch input:checked + .slider::before {
+            transform: translateX(28px);
+        }
+        `;
         const style = document.createElement('style');
         style.textContent = css;
         document.head.appendChild(style);
@@ -144,19 +147,18 @@
         const bar = document.createElement('div');
         bar.id = 'jiffy_toggle_bar';
 
-        // rechter emoji gebaseerd op geforceerde mode
         const emoji = forcedMode === 'dark' ? '☾' : '𖤓';
 
         bar.innerHTML = `
-    <div id="jiffy_toggle_inner">
-        <span id="emoji_left" style="font-size:22px;">🎨</span>
-        <label id="jiffy_switch">
-            <input type="checkbox" id="jiffy_mode_toggle" />
-            <span class="slider"></span>
-        </label>
-        <span id="emoji_right" style="font-size:22px;">${emoji}</span>
-    </div>
-    `;
+            <div id="jiffy_toggle_inner">
+                <span id="emoji_left" style="font-size:22px;">🎨</span>
+                <label id="jiffy_switch">
+                    <input type="checkbox" id="jiffy_mode_toggle" />
+                    <span class="slider"></span>
+                </label>
+                <span id="emoji_right" style="font-size:22px;">${emoji}</span>
+            </div>
+        `;
 
         document.body.appendChild(bar);
         return bar;
@@ -167,22 +169,21 @@
         const bar = injectToggleHTML(forcedMode);
 
         const toggle = document.getElementById('jiffy_mode_toggle');
-
-        // Start altijd in geforceerde modus (switch rechts)
         toggle.checked = true;
 
-        /* Push content down below the toggle bar */
+        /* --------------------------------------------
+        Apply padding BEFORE showing bar
+        This prevents scroll-blocking.
+        -------------------------------------------- */
         const barHeight = bar.offsetHeight;
         document.body.style.paddingTop = barHeight + 'px';
 
         /* --------------------------------------------
-       LIGHT MODE UI AANPASSINGEN
-    -------------------------------------------- */
+        Prepare light mode UI
+        -------------------------------------------- */
         if (forcedMode === 'light') {
-            // Bar achtergrond wit
             bar.style.background = '#f9f9f9';
 
-            // Slider achtergrond wit + lichtere border
             const slider = bar.querySelector('.slider');
             if (slider) {
                 slider.style.background = '#f9f9f9';
@@ -191,36 +192,34 @@
         }
 
         /* --------------------------------------------
-       Fade-in animatie
-    -------------------------------------------- */
+        Now safely enable fixed positioning
+        -------------------------------------------- */
         requestAnimationFrame(() => {
+            bar.style.position = 'fixed';
+            bar.style.top = '0';
+            bar.style.pointerEvents = 'auto';
             bar.style.opacity = 1;
         });
 
         /* --------------------------------------------
-       Toggle interactie
-    -------------------------------------------- */
+        Toggle interaction
+        -------------------------------------------- */
         toggle.addEventListener('change', () => {
             if (toggle.checked) {
-                // Forced mode terug activeren
                 applySnapshot(forcedStyles);
                 fixVideoBackgrounds();
-                // Emojis blijven gelijk!
             } else {
-                // Original mode
                 applySnapshot(originalStyles);
-                // Emojis blijven gelijk!
             }
         });
     }
 
     /* --------------------------------------------
-     INIT
-  -------------------------------------------- */
+    INIT
+    -------------------------------------------- */
 
     document.addEventListener('DOMContentLoaded', () => {
         elementsCache = Array.from(document.querySelectorAll(SELECTOR_LIST));
-
         originalBodyColor = getComputedStyle(document.body).color.trim();
 
         snapshotStyles(originalStyles);
@@ -231,24 +230,16 @@
             const currentColor = bodyStyles.color.trim();
             const currentBg = bodyStyles.backgroundColor.trim();
 
-            // Heeft Kajabi kleuren aangepast?
+            // Only build bar when forced mode exists
             if (currentColor !== originalBodyColor) {
-                // 1. Forced styles snapshot
                 snapshotStyles(forcedStyles);
-
-                // 2. Video backgrounds fixen
                 fixVideoBackgrounds();
 
-                // 3. Bepaal forced mode via echte background
                 let forcedMode = 'light';
 
-                if (currentBg.includes('16, 16, 16')) {
-                    forcedMode = 'dark';
-                } else if (currentBg.includes('255, 255, 255')) {
-                    forcedMode = 'light';
-                }
+                if (currentBg.includes('16, 16, 16')) forcedMode = 'dark';
+                if (currentBg.includes('255, 255, 255')) forcedMode = 'light';
 
-                // 4. Init toggle met correcte mode
                 initToggleBar(forcedMode);
             }
         }, 1000);
