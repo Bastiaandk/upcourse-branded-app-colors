@@ -29,15 +29,7 @@
     -------------------------------------------- */
 
     function snapshotStyles(targetMap) {
-        elementsCache.forEach((el) => {
-            const cs = getComputedStyle(el);
-            targetMap.set(el, {
-                color: cs.color,
-                bg: cs.backgroundColor,
-                inlineColor: el.style.color || null,
-                inlineBg: el.style.backgroundColor || null,
-            });
-        });
+
     }
 
     /* --------------------------------------------
@@ -45,22 +37,7 @@
     -------------------------------------------- */
 
     function applySnapshot(snapshotMap) {
-        elementsCache.forEach((el) => {
-            const saved = snapshotMap.get(el);
-            if (!saved) return;
 
-            el.style.setProperty(
-                "color",
-                saved.inlineColor !== null ? saved.inlineColor : saved.color,
-                "important"
-            );
-
-            el.style.setProperty(
-                "background-color",
-                saved.inlineBg !== null ? saved.inlineBg : saved.bg,
-                "important"
-            );
-        });
     }
 
     /* --------------------------------------------
@@ -68,10 +45,10 @@
     -------------------------------------------- */
 
     function fixVideoBackgrounds() {
-        //    document.querySelectorAll(VIDEO_SELECTOR).forEach((el) => {
-        //        el.style.removeProperty("background");
-        //        el.style.removeProperty("background-color");
-        //    });
+        document.querySelectorAll(VIDEO_SELECTOR).forEach((el) => {
+            el.style.removeProperty("background");
+            el.style.removeProperty("background-color");
+        });
     }
 
     /* --------------------------------------------
@@ -139,7 +116,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">debug - 6 - 🎨</span>
+                <span id="emoji_left" style="font-size:22px;">debug - 7 - 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch">
                     <div class="slider"></div>
