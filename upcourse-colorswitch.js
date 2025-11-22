@@ -61,7 +61,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 2 🎨</span>
+                <span style="font-size:22px;">debug 3 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch"></div>
 
@@ -145,6 +145,11 @@
         slider.style.setProperty("background-color", "#444", "important");
         slider.style.setProperty("border", "1px solid #222", "important");
         slider.style.setProperty("visibility", "visible", "important");
+
+        // FIX: set icon color hard AFTER hydration
+        const iconEl = bar.querySelector("span:last-child");
+        iconEl.style.setProperty("color", forcedMode === "dark" ? "#ddd" : "#fff", "important");
+        iconEl.style.setProperty("opacity", "1", "important");
 
         switchEl.appendChild(slider);
 
