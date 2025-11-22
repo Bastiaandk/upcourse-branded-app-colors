@@ -1,7 +1,7 @@
 (function () {
 
     /* --------------------------------------------
-    CSS (origineel, zonder slider visible in fase 1)
+    CSS (origineel, zonder slider zichtbaar in fase 1)
     -------------------------------------------- */
     function injectToggleCSS() {
         const css = `
@@ -32,7 +32,7 @@
             overflow: hidden;
         }
 
-        /* Nog GEEN slider in fase 1 */
+        /* slider pas zichtbaar na phase 2 */
         #jiffy_switch .slider {
             position: absolute;
             top: 3px;
@@ -53,7 +53,7 @@
     }
 
     /* --------------------------------------------
-    HTML BAR — SLIDER IS HIER WEGGELATEN!
+    HTML BAR — SLIDER EN ICON KOMEN LATER
     -------------------------------------------- */
     function injectToggleHTML() {
         const bar = document.createElement("div");
@@ -61,11 +61,12 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 1 🎨</span>
+                <span style="font-size:22px;">debug 2 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch"></div>
 
-                <span style="font-size:22px;">☾</span>
+                <!-- Icoon pas in phase 2 -->
+                <span id="jiffy_icon" style="font-size:22px;"></span>
             </div>
         `;
 
@@ -109,7 +110,7 @@
     }
 
     /* --------------------------------------------
-    PHASE 1 — EARLY BAR (NO SLIDER YET)
+    PHASE 1 — EARLY BAR (GEEN SLIDER, GEEN ICON)
     -------------------------------------------- */
     function initBarEarly() {
         injectToggleCSS();
@@ -131,38 +132,45 @@
     }
 
     /* --------------------------------------------
-    PHASE 2 — ADD SLIDER AFTER DUMP
+    PHASE 2 — SLIDER + ICON NA DUMP TOEVOEGEN
     -------------------------------------------- */
     function activateSlider(bar) {
 
         const switchEl = bar.querySelector("#jiffy_switch");
 
-        /* SLIDER WORDT HIER PAS GEMAAKT → NIET IN DE DUMP */
+        /* SLIDER AANMAKEN (Buiten Kajabi dump) */
         const slider = document.createElement("div");
         slider.className = "slider";
 
-        /* Hard protections — Kajabi kan dit niet overschrijven */
         slider.style.setProperty("background-color", "#444", "important");
         slider.style.setProperty("border", "1px solid #222", "important");
         slider.style.setProperty("visibility", "visible", "important");
 
         switchEl.appendChild(slider);
 
-        // determine forcedMode
+        /* forcedMode bepalen zoals origineel */
         const bodyStyles = getComputedStyle(document.body);
         const currentBg = bodyStyles.backgroundColor.trim();
         const forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
 
-        // tint slider (original behaviour)
+        /* SLIDER TINT */
         if (forcedMode === "light") {
             slider.style.setProperty("background-color", "#f9f9f9", "important");
             slider.style.setProperty("border-color", "#ccc", "important");
         }
 
-        // start active like original
+        /* ICON (SUN/MOON) INZETTEN — NET ALS ORIGINEEL */
+        const iconEl = bar.querySelector("#jiffy_icon");
+        const emoji = forcedMode === "dark" ? "☾" : "𖤓";
+        iconEl.textContent = emoji;
+
+        // kleur hard vastzetten
+        iconEl.style.setProperty("color", forcedMode === "dark" ? "#ddd" : "#fff", "important");
+
+        /* ACTIVE MODE START (zoals origineel) */
         switchEl.classList.add("active");
 
-        // restore full toggle logic
+        /* TOGGLE LOGICA (zoals origineel, zonder icon wissel) */
         switchEl.addEventListener("click", () => {
             switchEl.classList.toggle("active");
 
@@ -174,11 +182,6 @@
                 applySnapshot(originalStyles);
             }
         });
-
-        // FIX: set icon color hard AFTER hydration
-        const iconEl = bar.querySelector("span:last-child");
-        iconEl.style.setProperty("color", forcedMode === "dark" ? "#ddd" : "#fff", "important");
-        iconEl.style.setProperty("opacity", "1", "important");
     }
 
     /* --------------------------------------------
@@ -186,13 +189,11 @@
     -------------------------------------------- */
     document.addEventListener("DOMContentLoaded", () => {
 
-        // phase 1: early bar
         const bar = initBarEarly();
 
         elementsCache = Array.from(document.querySelectorAll(SELECTOR_LIST));
         snapshotStyles(originalStyles);
 
-        // Wait for Kajabi hydration to finish
         setTimeout(() => {
 
             snapshotStyles(forcedStyles);
