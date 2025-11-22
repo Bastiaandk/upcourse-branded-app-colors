@@ -137,44 +137,32 @@
 
         const switchEl = bar.querySelector("#jiffy_switch");
 
-        /* SLIDER PAS IN FASE 2 AANMAKEN */
+        /* SLIDER WORDT HIER PAS GEMAAKT → NIET IN DE DUMP */
         const slider = document.createElement("div");
         slider.className = "slider";
 
+        /* Hard protections — Kajabi kan dit niet overschrijven */
         slider.style.setProperty("background-color", "#444", "important");
         slider.style.setProperty("border", "1px solid #222", "important");
         slider.style.setProperty("visibility", "visible", "important");
 
         switchEl.appendChild(slider);
 
-        /* forcedMode bepalen */
+        // determine forcedMode
         const bodyStyles = getComputedStyle(document.body);
         const currentBg = bodyStyles.backgroundColor.trim();
         const forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
 
-        /* SLIDER TINT */
+        // tint slider (original behaviour)
         if (forcedMode === "light") {
             slider.style.setProperty("background-color", "#f9f9f9", "important");
             slider.style.setProperty("border-color", "#ccc", "important");
         }
 
-        /* ICOON PAS IN FASE 2 INVOEGEN — UIT DE DUMP HOUDEN */
-        const iconEl = bar.querySelector("#jiffy_icon");
-        const icon = forcedMode === "dark" ? "☾" : "𖤓";
-
-        iconEl.textContent = icon;
-
-        // Hard-protect the icon's color:
-        iconEl.style.setProperty(
-            "color",
-            forcedMode === "dark" ? "#ddd" : "#111",
-            "important"
-        );
-
-        /* ACTIVE MODE HERSTELLEN */
+        // start active like original
         switchEl.classList.add("active");
 
-        /* TOGGLE LOGICA TERUGZETTEN */
+        // restore full toggle logic
         switchEl.addEventListener("click", () => {
             switchEl.classList.toggle("active");
 
@@ -187,7 +175,6 @@
             }
         });
     }
-
 
     /* --------------------------------------------
     INIT
