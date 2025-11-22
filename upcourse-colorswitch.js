@@ -61,7 +61,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 1 🎨</span>
+                <span style="font-size:22px;">debug 2 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch"></div>
 
@@ -137,32 +137,44 @@
 
         const switchEl = bar.querySelector("#jiffy_switch");
 
-        /* SLIDER WORDT HIER PAS GEMAAKT → NIET IN DE DUMP */
+        /* SLIDER PAS IN FASE 2 AANMAKEN */
         const slider = document.createElement("div");
         slider.className = "slider";
 
-        /* Hard protections — Kajabi kan dit niet overschrijven */
         slider.style.setProperty("background-color", "#444", "important");
         slider.style.setProperty("border", "1px solid #222", "important");
         slider.style.setProperty("visibility", "visible", "important");
 
         switchEl.appendChild(slider);
 
-        // determine forcedMode
+        /* forcedMode bepalen */
         const bodyStyles = getComputedStyle(document.body);
         const currentBg = bodyStyles.backgroundColor.trim();
         const forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
 
-        // tint slider (original behaviour)
+        /* SLIDER TINT */
         if (forcedMode === "light") {
             slider.style.setProperty("background-color", "#f9f9f9", "important");
             slider.style.setProperty("border-color", "#ccc", "important");
         }
 
-        // start active like original
+        /* ICOON PAS IN FASE 2 INVOEGEN — UIT DE DUMP HOUDEN */
+        const iconEl = bar.querySelector("#jiffy_icon");
+        const icon = forcedMode === "dark" ? "☾" : "𖤓";
+
+        iconEl.textContent = icon;
+
+        // Hard-protect the icon's color:
+        iconEl.style.setProperty(
+            "color",
+            forcedMode === "dark" ? "#ddd" : "#111",
+            "important"
+        );
+
+        /* ACTIVE MODE HERSTELLEN */
         switchEl.classList.add("active");
 
-        // restore full toggle logic
+        /* TOGGLE LOGICA TERUGZETTEN */
         switchEl.addEventListener("click", () => {
             switchEl.classList.toggle("active");
 
@@ -175,6 +187,7 @@
             }
         });
     }
+
 
     /* --------------------------------------------
     INIT
