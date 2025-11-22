@@ -61,7 +61,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 2 🎨</span>
+                <span style="font-size:22px;">debug 3 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch">
                     <div class="slider"></div>
@@ -186,7 +186,8 @@
         setTimeout(() => {
             snapshotStyles(forcedStyles);
 
-            initToggleBar();
+            let forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
+            initToggleBar(forcedMode);
         }, 500);
     });
 
