@@ -81,18 +81,25 @@
     function injectToggleCSS() {
         const css = `
         #jiffy_toggle_bar {
-            /* Initial safe state to prevent scroll blocking */
-            position: absolute;
-            top: -9999px;
+            position: fixed;
+            top: 0;
             left: 0;
             width: 100%;
             background: #111;
             padding: 5px 0;
             z-index: 999999999;
             opacity: 0;
-            pointer-events: none;
             transition: opacity 0.4s ease;
         }
+
+        /* Mobile fix: sticky so scrolling stays smooth */
+        @media (max-width: 900px) {
+            #jiffy_toggle_bar {
+                position: sticky !important;
+                top: 0 !important;
+            }
+        }
+
         #jiffy_toggle_inner {
             display: flex;
             align-items: center;
@@ -171,16 +178,9 @@
         const toggle = document.getElementById('jiffy_mode_toggle');
         toggle.checked = true;
 
-        /* --------------------------------------------
-        Apply padding BEFORE showing bar
-        This prevents scroll-blocking.
-        -------------------------------------------- */
         const barHeight = bar.offsetHeight;
         document.body.style.paddingTop = barHeight + 'px';
 
-        /* --------------------------------------------
-        Prepare light mode UI
-        -------------------------------------------- */
         if (forcedMode === 'light') {
             bar.style.background = '#f9f9f9';
 
@@ -191,19 +191,10 @@
             }
         }
 
-        /* --------------------------------------------
-        Now safely enable fixed positioning
-        -------------------------------------------- */
         requestAnimationFrame(() => {
-            bar.style.position = 'fixed';
-            bar.style.top = '0';
-            bar.style.pointerEvents = 'auto';
             bar.style.opacity = 1;
         });
 
-        /* --------------------------------------------
-        Toggle interaction
-        -------------------------------------------- */
         toggle.addEventListener('change', () => {
             if (toggle.checked) {
                 applySnapshot(forcedStyles);
@@ -230,7 +221,6 @@
             const currentColor = bodyStyles.color.trim();
             const currentBg = bodyStyles.backgroundColor.trim();
 
-            // Only build bar when forced mode exists
             if (currentColor !== originalBodyColor) {
                 snapshotStyles(forcedStyles);
                 fixVideoBackgrounds();
