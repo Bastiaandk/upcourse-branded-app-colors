@@ -42,6 +42,7 @@
             transition: transform 0.25s ease;
         }
 
+        /* MOVEMENT */
         #jiffy_switch.active .slider {
             transform: translateX(28px);
         }
@@ -60,7 +61,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 🎨</span>
+                <span style="font-size:22px;">debug 2 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch">
                     <div class="slider"></div>
@@ -81,10 +82,13 @@
     }
 
     /* --------------------------------------------
-    TOGGLE ANIMATION ONLY (NO SIDE EFFECTS)
+    ONLY UI ANIMATION (NO SIDE EFFECTS)
     -------------------------------------------- */
     function initToggle(bar) {
         const switchEl = bar.querySelector("#jiffy_switch");
+
+        // Make it start inactive
+        switchEl.classList.remove("active");
 
         switchEl.addEventListener("click", () => {
             switchEl.classList.toggle("active");
