@@ -29,7 +29,15 @@
     -------------------------------------------- */
 
     function snapshotStyles(targetMap) {
-
+        elementsCache.forEach((el) => {
+            const cs = getComputedStyle(el);
+            targetMap.set(el, {
+                color: cs.color,
+                bg: cs.backgroundColor,
+                inlineColor: el.style.color || null,
+                inlineBg: el.style.backgroundColor || null,
+            });
+        });
     }
 
     /* --------------------------------------------
@@ -37,7 +45,22 @@
     -------------------------------------------- */
 
     function applySnapshot(snapshotMap) {
+        elementsCache.forEach((el) => {
+            const saved = snapshotMap.get(el);
+            if (!saved) return;
 
+            el.style.setProperty(
+                "color",
+                saved.inlineColor !== null ? saved.inlineColor : saved.color,
+                "important"
+            );
+
+            el.style.setProperty(
+                "background-color",
+                saved.inlineBg !== null ? saved.inlineBg : saved.bg,
+                "important"
+            );
+        });
     }
 
     /* --------------------------------------------
@@ -116,7 +139,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">debug - 7 - 🎨</span>
+                <span id="emoji_left" style="font-size:22px;">debug - 6 - 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch">
                     <div class="slider"></div>
@@ -145,10 +168,46 @@
 
         if (placeholder) {
             placeholder.replaceWith(bar);
+
+            // VISUAL DEBUG: tonen dat placeholder-pad gebruikt wordt
+            const msg = document.createElement("div");
+            msg.textContent = "placeholder OK";
+            msg.style.cssText = `
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        background: #2ecc71;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        z-index: 999999999;
+    `;
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+
         } else {
-            console.warn("Jiffy placeholder not found — fallback to prepend.");
+
             document.body.prepend(bar);
+
+            // VISUAL DEBUG: tonen dat fallback-pad gebruikt wordt
+            const msg = document.createElement("div");
+            msg.textContent = "placeholder NOT found (fallback)";
+            msg.style.cssText = `
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        background: #e74c3c;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        z-index: 999999999;
+    `;
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
         }
+
 
         /* ---- NEW PURE-DIV SWITCH ---- */
         const switchEl = bar.querySelector("#jiffy_switch");
