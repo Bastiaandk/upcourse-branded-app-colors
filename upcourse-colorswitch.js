@@ -145,8 +145,8 @@
         const emoji = forcedMode === 'dark' ? '☾' : '𖤓';
 
         bar.innerHTML = `
-            <div id="jiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">debug-v4-🎨</span>
+            <div id="xxxjiffy_toggle_inner">
+                <span id="emoji_left" style="font-size:22px;">debug-v5-🎨</span>
                 <label id="jiffy_switch">
                     <input type="checkbox" id="jiffy_mode_toggle" />
                     <span class="slider"></span>
