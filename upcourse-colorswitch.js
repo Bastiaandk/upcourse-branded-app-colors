@@ -176,14 +176,9 @@
         const bar = injectToggleHTML(forcedMode);
 
         /* --------------------------------------------
-        CRITICAL FIX: Insert bar INSIDE the main scroll container
+        CRITICAL FIX: Insert bar INSIDE lessoncontainer
         -------------------------------------------- */
-        const main =
-            document.querySelector('main') ||
-            document.querySelector('.main-content') ||
-            document.body;
-
-        main.prepend(bar);
+        document.querySelector('.lessoncontainer').prepend(bar);
 
         const toggle = document.getElementById('jiffy_mode_toggle');
         toggle.checked = true;
