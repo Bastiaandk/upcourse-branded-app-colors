@@ -179,7 +179,7 @@
         toggle.checked = true;
 
         const barHeight = bar.offsetHeight;
-        document.body.style.paddingTop = barHeight + 'px';
+        // document.body.style.paddingTop = barHeight + 'px';
 
         if (forcedMode === 'light') {
             bar.style.background = '#f9f9f9';
