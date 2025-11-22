@@ -61,7 +61,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 4 🎨</span>
+                <span style="font-size:22px;">debug 1 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch"></div>
 
@@ -174,6 +174,14 @@
                 applySnapshot(originalStyles);
             }
         });
+
+        // FIX: set icon color hard AFTER hydration
+        const iconEl = bar.querySelector("span:last-child");
+        iconEl.style.setProperty("color", forcedMode === "dark" ? "#ddd" : "#fff", "important");
+        iconEl.style.setProperty("opacity", "1", "important");
+
+
+
     }
 
     /* --------------------------------------------
