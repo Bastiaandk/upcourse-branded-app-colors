@@ -49,17 +49,15 @@
             const saved = snapshotMap.get(el);
             if (!saved) return;
 
-            if (saved.inlineColor !== null) {
-                el.style.setProperty('color', saved.inlineColor, 'important');
-            } else {
-                el.style.setProperty('color', saved.color, 'important');
-            }
+            el.style.setProperty('color',
+                saved.inlineColor !== null ? saved.inlineColor : saved.color,
+                'important'
+            );
 
-            if (saved.inlineBg !== null) {
-                el.style.setProperty('background-color', saved.inlineBg, 'important');
-            } else {
-                el.style.setProperty('background-color', saved.bg, 'important');
-            }
+            el.style.setProperty('background-color',
+                saved.inlineBg !== null ? saved.inlineBg : saved.bg,
+                'important'
+            );
         });
     }
 
@@ -139,7 +137,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">debug v2 - 🎨</span>
+                <span id="emoji_left" style="font-size:22px;">debug v4 - 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch">
                     <div class="slider"></div>
@@ -167,7 +165,7 @@
 
         /* ---- NEW PURE-DIV SWITCH ---- */
         const switchEl = bar.querySelector('#jiffy_switch');
-        switchEl.classList.add('active'); // begin in geforceerde modus
+        switchEl.classList.add('active'); // start in forced mode
 
         switchEl.addEventListener('click', () => {
             switchEl.classList.toggle('active');
@@ -216,10 +214,7 @@
                 snapshotStyles(forcedStyles);
                 fixVideoBackgrounds();
 
-                let forcedMode = 'light';
-
-                if (currentBg.includes('16, 16, 16')) forcedMode = 'dark';
-                if (currentBg.includes('255, 255, 255')) forcedMode = 'light';
+                let forcedMode = currentBg.includes('16, 16, 16') ? 'dark' : 'light';
 
                 initToggleBar(forcedMode);
             }
