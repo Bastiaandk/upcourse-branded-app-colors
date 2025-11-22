@@ -1,7 +1,7 @@
 (function () {
 
     /* --------------------------------------------
-    CSS (identiek aan origineel)
+    CSS (zonder wijzigingen)
     -------------------------------------------- */
     function injectToggleCSS() {
         const css = `
@@ -53,7 +53,7 @@
     }
 
     /* --------------------------------------------
-    HTML (identiek aan origineel)
+    HTML
     -------------------------------------------- */
     function injectToggleHTML() {
         const bar = document.createElement("div");
@@ -61,7 +61,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 4 🎨</span>
+                <span style="font-size:22px;">debug 1 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch">
                     <div class="slider"></div>
@@ -75,7 +75,7 @@
     }
 
     /* --------------------------------------------
-    SNAPSHOT STYLES (origineel, 1-op-1)
+    snapshotStyles (geen writes)
     -------------------------------------------- */
     const SELECTOR_LIST =
         'div,section,article,header,footer,main,aside,' +
@@ -84,8 +84,8 @@
         'strong,em,b,i,small,blockquote,mark,' +
         'img,button,label,[style]';
 
-    const snapshotMap = new WeakMap();
     let elementsCache = [];
+    const snapshotMap = new WeakMap();
 
     function snapshotStyles() {
         elementsCache.forEach((el) => {
@@ -100,7 +100,21 @@
     }
 
     /* --------------------------------------------
-    INIT TOGGLE BAR (UI only)
+    fixVideoBackgrounds
+    -------------------------------------------- */
+    const VIDEO_SELECTOR =
+        '.block-type--video, .block-type--video *,' +
+        '.block-type--gamify_video, .block-type--gamify_video *';
+
+    function fixVideoBackgrounds() {
+        document.querySelectorAll(VIDEO_SELECTOR).forEach((el) => {
+            el.style.removeProperty("background");
+            el.style.removeProperty("background-color");
+        });
+    }
+
+    /* --------------------------------------------
+    INIT BAR
     -------------------------------------------- */
     function initToggleBar() {
         injectToggleCSS();
@@ -115,15 +129,16 @@
         }
 
         const switchEl = bar.querySelector("#jiffy_switch");
-
-        switchEl.classList.add("active"); // start like original
+        switchEl.classList.add("active");
 
         switchEl.addEventListener("click", () => {
             switchEl.classList.toggle("active");
 
-            // ONLY snapshotStyles is triggered — nothing else
+            // test only: snapshot + fixVideoBackgrounds
             snapshotStyles();
-            console.log("snapshotStyles executed — test mode.");
+            fixVideoBackgrounds();
+
+            console.log("Test #2: snapshotStyles + fixVideoBackgrounds executed");
         });
 
         requestAnimationFrame(() => {
@@ -137,7 +152,7 @@
     document.addEventListener("DOMContentLoaded", () => {
         elementsCache = Array.from(document.querySelectorAll(SELECTOR_LIST));
 
-        // Pre-scan like original (no side effects)
+        // eerste scan maar GEEN wijzigingen
         snapshotStyles();
 
         initToggleBar();
