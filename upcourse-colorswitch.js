@@ -1,14 +1,14 @@
 (function () {
 
     /* --------------------------------------------
-    TOGGLE UI CSS (exact zoals origineel)
+    CSS (identiek aan origineel)
     -------------------------------------------- */
     function injectToggleCSS() {
         const css = `
         #jiffy_toggle_bar {
             width: 100%;
             padding: 5px 0;
-            background: #111;            /* originele bar background */
+            background: #111;
             opacity: 0;
             transition: opacity 0.4s ease;
         }
@@ -25,7 +25,7 @@
             position: relative;
             width: 60px;
             height: 30px;
-            background: #111;            /* LET OP: dit is de kleur die de slider zichtbaar maakt */
+            background: #111;
             border: 2px solid #444;
             border-radius: 20px;
             cursor: pointer;
@@ -38,7 +38,7 @@
             left: 3px;
             width: 22px;
             height: 22px;
-            background: #444;            /* oorspronkelijk → hierdoor zie je hem in het echt */
+            background: #444;
             border-radius: 50%;
             transition: transform 0.25s ease;
         }
@@ -53,7 +53,7 @@
     }
 
     /* --------------------------------------------
-    TOGGLE UI HTML (exact zoals origineel)
+    HTML (identiek aan origineel)
     -------------------------------------------- */
     function injectToggleHTML() {
         const bar = document.createElement("div");
@@ -61,7 +61,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 3 🎨</span>
+                <span style="font-size:22px;">debug 4 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch">
                     <div class="slider"></div>
@@ -75,14 +75,39 @@
     }
 
     /* --------------------------------------------
-    INIT TOGGLE BAR (UI only – geen side effects)
+    SNAPSHOT STYLES (origineel, 1-op-1)
+    -------------------------------------------- */
+    const SELECTOR_LIST =
+        'div,section,article,header,footer,main,aside,' +
+        'span,p,a,li,ul,ol,' +
+        'h1,h2,h3,h4,h5,h6,' +
+        'strong,em,b,i,small,blockquote,mark,' +
+        'img,button,label,[style]';
+
+    const snapshotMap = new WeakMap();
+    let elementsCache = [];
+
+    function snapshotStyles() {
+        elementsCache.forEach((el) => {
+            const cs = getComputedStyle(el);
+            snapshotMap.set(el, {
+                color: cs.color,
+                bg: cs.backgroundColor,
+                inlineColor: el.style.color || null,
+                inlineBg: el.style.backgroundColor || null,
+            });
+        });
+    }
+
+    /* --------------------------------------------
+    INIT TOGGLE BAR (UI only)
     -------------------------------------------- */
     function initToggleBar() {
         injectToggleCSS();
 
         const bar = injectToggleHTML();
-
         const placeholder = document.getElementById("jiffy_bar_placeholder");
+
         if (placeholder) {
             placeholder.replaceWith(bar);
         } else {
@@ -91,13 +116,14 @@
 
         const switchEl = bar.querySelector("#jiffy_switch");
 
-        /* EXACT zoals origineel:
-           switch start in active mode → slider staat rechts en is goed zichtbaar */
-        switchEl.classList.add("active");
+        switchEl.classList.add("active"); // start like original
 
-        /* Alleen toggle movement */
         switchEl.addEventListener("click", () => {
             switchEl.classList.toggle("active");
+
+            // ONLY snapshotStyles is triggered — nothing else
+            snapshotStyles();
+            console.log("snapshotStyles executed — test mode.");
         });
 
         requestAnimationFrame(() => {
@@ -109,6 +135,11 @@
     INIT
     -------------------------------------------- */
     document.addEventListener("DOMContentLoaded", () => {
+        elementsCache = Array.from(document.querySelectorAll(SELECTOR_LIST));
+
+        // Pre-scan like original (no side effects)
+        snapshotStyles();
+
         initToggleBar();
     });
 
