@@ -81,8 +81,8 @@
     function injectToggleCSS() {
         const css = `
         #jiffy_toggle_bar {
-            position: fixed;
-            top: 0;
+            position: static;
+            top: auto;
             left: 0;
             width: 100%;
             background: #111;
