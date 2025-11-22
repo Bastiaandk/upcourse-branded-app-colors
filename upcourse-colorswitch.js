@@ -92,7 +92,7 @@
             transition: opacity 0.4s ease;
         }
 
-        /* Mobile fix: sticky so scrolling stays smooth */
+        /* Mobile: sticky so Safari stays smooth */
         @media (max-width: 900px) {
             #jiffy_toggle_bar {
                 position: sticky !important;
@@ -167,23 +167,29 @@
             </div>
         `;
 
-        document.body.appendChild(bar);
         return bar;
     }
 
     function initToggleBar(forcedMode) {
         injectToggleCSS();
+
         const bar = injectToggleHTML(forcedMode);
+
+        /* --------------------------------------------
+        CRITICAL FIX: Insert bar INSIDE the main scroll container
+        -------------------------------------------- */
+        const main =
+            document.querySelector('main') ||
+            document.querySelector('.main-content') ||
+            document.body;
+
+        main.prepend(bar);
 
         const toggle = document.getElementById('jiffy_mode_toggle');
         toggle.checked = true;
 
-        const barHeight = bar.offsetHeight;
-        // document.body.style.paddingTop = barHeight + 'px';
-
         if (forcedMode === 'light') {
             bar.style.background = '#f9f9f9';
-
             const slider = bar.querySelector('.slider');
             if (slider) {
                 slider.style.background = '#f9f9f9';
