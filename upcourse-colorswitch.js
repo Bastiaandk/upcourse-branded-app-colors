@@ -179,9 +179,6 @@
         const iconEl = bar.querySelector("span:last-child");
         iconEl.style.setProperty("color", forcedMode === "dark" ? "#ddd" : "#fff", "important");
         iconEl.style.setProperty("opacity", "1", "important");
-
-
-
     }
 
     /* --------------------------------------------
