@@ -75,7 +75,7 @@
     }
 
     /* --------------------------------------------
-    TOGGLE UI
+    TOGGLE UI CSS
     -------------------------------------------- */
 
     function injectToggleCSS() {
@@ -84,9 +84,9 @@
             width: 100%;
             padding: 5px 0;
             background: #111;
+            opacity: 0;
             transition: opacity 0.4s ease;
         }
-
 
         #jiffy_toggle_inner {
             display: flex;
@@ -95,31 +95,19 @@
             gap: 14px;
             width: 100%;
         }
+
         #jiffy_switch {
             position: relative;
-            width: 60px;
-            height: 30px;
-            display: inline-block;
-        }
-        #jiffy_switch input {
-            position: absolute;
-            height: 30px;
-            width: 60px;
-            opacity: 0;
-            cursor: pointer;
-            z-index: 3;
-        }
-        #jiffy_switch .slider {
-            position: absolute;
             width: 60px;
             height: 30px;
             background: #111;
             border: 2px solid #444;
             border-radius: 20px;
-            z-index: 1;
+            cursor: pointer;
+            overflow: hidden;
         }
-        #jiffy_switch .slider::before {
-            content: "";
+
+        #jiffy_switch .slider {
             position: absolute;
             top: 3px;
             left: 3px;
@@ -129,31 +117,71 @@
             border-radius: 50%;
             transition: transform 0.25s ease;
         }
-        #jiffy_switch input:checked + .slider::before {
+
+        #jiffy_switch.active .slider {
             transform: translateX(28px);
         }
-      `;
+        `;
         const style = document.createElement('style');
         style.textContent = css;
         document.head.appendChild(style);
     }
 
+    /* --------------------------------------------
+    TOGGLE UI HTML
+    -------------------------------------------- */
 
+    function injectToggleHTML(forcedMode) {
+        const bar = document.createElement('div');
+        bar.id = 'jiffy_toggle_bar';
+
+        const emoji = forcedMode === 'dark' ? '☾' : '𖤓';
+
+        bar.innerHTML = `
+            <div id="jiffy_toggle_inner">
+                <span id="emoji_left" style="font-size:22px;">🎨</span>
+
+                <div id="jiffy_switch" aria-role="switch">
+                    <div class="slider"></div>
+                </div>
+
+                <span id="emoji_right" style="font-size:22px;">${emoji}</span>
+            </div>
+        `;
+
+        return bar;
+    }
+
+    /* --------------------------------------------
+    INIT TOGGLE BAR
+    -------------------------------------------- */
 
     function initToggleBar(forcedMode) {
         injectToggleCSS();
 
         const bar = injectToggleHTML(forcedMode);
 
-        /* --------------------------------------------
-        SAFE INSERT: no reflow, no scroll bugs
-        -------------------------------------------- */
+        /* SAFE INSERT */
         const container = document.querySelector('.lessoncontainer');
         container.insertBefore(bar, container.firstChild);
 
-        const toggle = document.getElementById('jiffy_mode_toggle');
-        toggle.checked = true;
+        /* ---- NEW PURE-DIV SWITCH ---- */
+        const switchEl = bar.querySelector('#jiffy_switch');
+        switchEl.classList.add('active'); // begin in geforceerde modus
 
+        switchEl.addEventListener('click', () => {
+            switchEl.classList.toggle('active');
+            const isOn = switchEl.classList.contains('active');
+
+            if (isOn) {
+                applySnapshot(forcedStyles);
+                fixVideoBackgrounds();
+            } else {
+                applySnapshot(originalStyles);
+            }
+        });
+
+        /* Optional: Light mode tint */
         if (forcedMode === 'light') {
             bar.style.background = '#f9f9f9';
             const slider = bar.querySelector('.slider');
@@ -166,17 +194,7 @@
         requestAnimationFrame(() => {
             bar.style.opacity = 1;
         });
-
-        toggle.addEventListener('change', () => {
-            if (toggle.checked) {
-                applySnapshot(forcedStyles);
-                fixVideoBackgrounds();
-            } else {
-                applySnapshot(originalStyles);
-            }
-        });
     }
-
 
     /* --------------------------------------------
     INIT
