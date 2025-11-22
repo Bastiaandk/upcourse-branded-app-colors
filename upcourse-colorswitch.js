@@ -55,9 +55,11 @@
     /* --------------------------------------------
     HTML (origineel)
     -------------------------------------------- */
-    function injectToggleHTML() {
+    function injectToggleHTML(forcedMode) {
         const bar = document.createElement("div");
         bar.id = "jiffy_toggle_bar";
+
+        const emoji = forcedMode === "dark" ? "☾" : "𖤓";
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
@@ -67,7 +69,7 @@
                     <div class="slider"></div>
                 </div>
 
-                <span style="font-size:22px;">☾</span>
+                <span style="font-size:22px;">${emoji}</span>
             </div>
         `;
 
@@ -75,7 +77,7 @@
     }
 
     /* --------------------------------------------
-    snapshotStyles (nodig voor applySnapshot)
+    snapshotStyles
     -------------------------------------------- */
     const SELECTOR_LIST =
         'div,section,article,header,footer,main,aside,' +
@@ -101,7 +103,7 @@
     }
 
     /* --------------------------------------------
-    applySnapshot ONLY
+    applySnapshot
     -------------------------------------------- */
     function applySnapshot(snapshotMap) {
         elementsCache.forEach((el) => {
@@ -123,12 +125,12 @@
     }
 
     /* --------------------------------------------
-    INIT BAR
+    INIT BAR (gefixte versie)
     -------------------------------------------- */
     function initToggleBar(forcedMode) {
         injectToggleCSS();
 
-        const bar = injectToggleHTML();
+        const bar = injectToggleHTML(forcedMode);
         const placeholder = document.getElementById("jiffy_bar_placeholder");
 
         if (placeholder) {
@@ -138,7 +140,6 @@
         }
 
         const switchEl = bar.querySelector("#jiffy_switch");
-
         switchEl.classList.add("active");
 
         switchEl.addEventListener("click", () => {
@@ -156,8 +157,7 @@
         });
 
         /* --------------------------------------------
-           SLIDER FIX — zoals in het origineel
-           (dit maakt het schuifje weer zichtbaar)
+           SLIDER FIX — exact zoals origineel bedoeld
         -------------------------------------------- */
         if (forcedMode === "light") {
             const slider = bar.querySelector(".slider");
@@ -172,22 +172,25 @@
         });
     }
 
-
     /* --------------------------------------------
     INIT
     -------------------------------------------- */
     document.addEventListener("DOMContentLoaded", () => {
-        elementsCache = Array.from(document.querySelectorAll(SELECTOR_LIST));
 
-        // eerste snapshots maken (zoals origineel)
+        elementsCache = Array.from(document.querySelectorAll(SELECTOR_LIST));
         snapshotStyles(originalStyles);
 
-        // forced snapshot maken (zoals origineel)
         setTimeout(() => {
+
+            // Originele detectie teruggeplaatst
+            const bodyStyles = getComputedStyle(document.body);
+            const currentBg = bodyStyles.backgroundColor.trim();
+            const forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
+
             snapshotStyles(forcedStyles);
 
-            let forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
             initToggleBar(forcedMode);
+
         }, 500);
     });
 
