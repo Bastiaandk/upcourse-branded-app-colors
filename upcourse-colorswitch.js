@@ -80,18 +80,6 @@
 
     function injectToggleCSS() {
         const css = `
-        #xxxjiffy_toggle_bar {
-            position: static;
-            top: auto;
-            left: 0;
-            width: 100%;
-            background: #111;
-            padding: 5px 0;
-            z-index: 999999999;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
         #jiffy_toggle_bar {
             width: 100%;
             padding: 5px 0;
@@ -99,7 +87,52 @@
             transition: opacity 0.4s ease;
         }
 
-        `;
+
+        #jiffy_toggle_inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            width: 100%;
+        }
+        #jiffy_switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            display: inline-block;
+        }
+        #jiffy_switch input {
+            position: absolute;
+            height: 30px;
+            width: 60px;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 3;
+        }
+        #jiffy_switch .slider {
+            position: absolute;
+            width: 60px;
+            height: 30px;
+            background: #111;
+            border: 2px solid #444;
+            border-radius: 20px;
+            z-index: 1;
+        }
+        #jiffy_switch .slider::before {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: #444;
+            border-radius: 50%;
+            transition: transform 0.25s ease;
+        }
+        #jiffy_switch input:checked + .slider::before {
+            transform: translateX(28px);
+        }
+      `;
         const style = document.createElement('style');
         style.textContent = css;
         document.head.appendChild(style);
@@ -113,7 +146,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">debug-v3-🎨</span>
+                <span id="emoji_left" style="font-size:22px;">debug-v4-🎨</span>
                 <label id="jiffy_switch">
                     <input type="checkbox" id="jiffy_mode_toggle" />
                     <span class="slider"></span>
@@ -131,9 +164,10 @@
         const bar = injectToggleHTML(forcedMode);
 
         /* --------------------------------------------
-        CRITICAL FIX: Insert bar INSIDE lessoncontainer
+        SAFE INSERT: no reflow, no scroll bugs
         -------------------------------------------- */
-        document.querySelector('.lessoncontainer').prepend(bar);
+        const container = document.querySelector('.lessoncontainer');
+        container.insertBefore(bar, container.firstChild);
 
         const toggle = document.getElementById('jiffy_mode_toggle');
         toggle.checked = true;
@@ -160,6 +194,7 @@
             }
         });
     }
+
 
     /* --------------------------------------------
     INIT
