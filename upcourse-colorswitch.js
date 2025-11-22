@@ -38,10 +38,10 @@
             left: 3px;
             width: 22px;
             height: 22px;
-            background: #444;
+            background: #444 !important;
             border-radius: 50%;
             transition: transform 0.25s ease;
-            visibility: hidden; /* FASE 1 FIX */
+            visibility: visible !important;
         }
 
         #jiffy_switch.active .slider {
