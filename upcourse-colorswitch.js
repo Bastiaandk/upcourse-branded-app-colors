@@ -1,8 +1,9 @@
 (function () {
+
     /* --------------------------------------------
-    MINIMAL CSS (unchanged from original)
+    TOGGLE UI CSS
     -------------------------------------------- */
-    function injectCSS() {
+    function injectToggleCSS() {
         const css = `
         #jiffy_toggle_bar {
             width: 100%;
@@ -42,6 +43,7 @@
             transition: transform 0.25s ease;
         }
 
+        /* slider movement */
         #jiffy_switch.active .slider {
             transform: translateX(28px);
         }
@@ -52,23 +54,36 @@
     }
 
     /* --------------------------------------------
-    HTML (same structure as original)
+    TOGGLE UI HTML
     -------------------------------------------- */
-    function injectHTML() {
+    function injectToggleHTML(forcedMode) {
         const bar = document.createElement("div");
         bar.id = "jiffy_toggle_bar";
 
+        const emoji = forcedMode === "dark" ? "☾" : "𖤓";
+
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 🎨</span>
+                <span id="emoji_left" style="font-size:22px;">debug 2 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch">
                     <div class="slider"></div>
                 </div>
 
-                <span style="font-size:22px;">☾</span>
+                <span id="emoji_right" style="font-size:22px;">${emoji}</span>
             </div>
         `;
+
+        return bar;
+    }
+
+    /* --------------------------------------------
+    INIT TOGGLE BAR (UI ONLY)
+    -------------------------------------------- */
+    function initToggleBar(forcedMode) {
+        injectToggleCSS();
+
+        const bar = injectToggleHTML(forcedMode);
 
         const placeholder = document.getElementById("jiffy_bar_placeholder");
         if (placeholder) {
@@ -77,22 +92,25 @@
             document.body.prepend(bar);
         }
 
-        return bar;
-    }
-
-    /* --------------------------------------------
-    REAL WORKING TOGGLE (UI ONLY)
-    -------------------------------------------- */
-    function initToggle(bar) {
         const switchEl = bar.querySelector("#jiffy_switch");
 
-        /* IMPORTANT: mimic original behavior
-           The switch starts as active in the original script. */
+        // Start the switch in the same mode as the original script
         switchEl.classList.add("active");
 
+        // Toggle only affects the slider movement
         switchEl.addEventListener("click", () => {
             switchEl.classList.toggle("active");
         });
+
+        // Light mode tint
+        if (forcedMode === "light") {
+            bar.style.background = "#f9f9f9";
+            const slider = bar.querySelector(".slider");
+            if (slider) {
+                slider.style.background = "#f9f9f9";
+                slider.style.borderColor = "#ccc";
+            }
+        }
 
         requestAnimationFrame(() => {
             bar.style.opacity = 1;
@@ -100,11 +118,16 @@
     }
 
     /* --------------------------------------------
-    INIT
+    INIT (Minimal forcedMode detection stays)
     -------------------------------------------- */
     document.addEventListener("DOMContentLoaded", () => {
-        injectCSS();
-        const bar = injectHTML();
-        initToggle(bar);
+        const bodyStyles = getComputedStyle(document.body);
+        const currentBg = bodyStyles.backgroundColor.trim();
+
+        // original logic: detect dark/light
+        let forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
+
+        initToggleBar(forcedMode);
     });
+
 })();
