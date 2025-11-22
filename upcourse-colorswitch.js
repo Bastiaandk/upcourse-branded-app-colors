@@ -1,14 +1,14 @@
 (function () {
 
     /* --------------------------------------------
-    TOGGLE UI CSS
+    TOGGLE UI CSS (exact zoals origineel)
     -------------------------------------------- */
     function injectToggleCSS() {
         const css = `
         #jiffy_toggle_bar {
             width: 100%;
             padding: 5px 0;
-            background: #111;
+            background: #111;            /* originele bar background */
             opacity: 0;
             transition: opacity 0.4s ease;
         }
@@ -25,7 +25,7 @@
             position: relative;
             width: 60px;
             height: 30px;
-            background: #111;
+            background: #111;            /* LET OP: dit is de kleur die de slider zichtbaar maakt */
             border: 2px solid #444;
             border-radius: 20px;
             cursor: pointer;
@@ -38,12 +38,11 @@
             left: 3px;
             width: 22px;
             height: 22px;
-            background: #444;
+            background: #444;            /* oorspronkelijk → hierdoor zie je hem in het echt */
             border-radius: 50%;
             transition: transform 0.25s ease;
         }
 
-        /* slider movement */
         #jiffy_switch.active .slider {
             transform: translateX(28px);
         }
@@ -54,23 +53,21 @@
     }
 
     /* --------------------------------------------
-    TOGGLE UI HTML
+    TOGGLE UI HTML (exact zoals origineel)
     -------------------------------------------- */
-    function injectToggleHTML(forcedMode) {
+    function injectToggleHTML() {
         const bar = document.createElement("div");
         bar.id = "jiffy_toggle_bar";
 
-        const emoji = forcedMode === "dark" ? "☾" : "𖤓";
-
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">debug 2 🎨</span>
+                <span style="font-size:22px;">debug 3 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch">
                     <div class="slider"></div>
                 </div>
 
-                <span id="emoji_right" style="font-size:22px;">${emoji}</span>
+                <span style="font-size:22px;">☾</span>
             </div>
         `;
 
@@ -78,12 +75,12 @@
     }
 
     /* --------------------------------------------
-    INIT TOGGLE BAR (UI ONLY)
+    INIT TOGGLE BAR (UI only – geen side effects)
     -------------------------------------------- */
-    function initToggleBar(forcedMode) {
+    function initToggleBar() {
         injectToggleCSS();
 
-        const bar = injectToggleHTML(forcedMode);
+        const bar = injectToggleHTML();
 
         const placeholder = document.getElementById("jiffy_bar_placeholder");
         if (placeholder) {
@@ -94,23 +91,14 @@
 
         const switchEl = bar.querySelector("#jiffy_switch");
 
-        // Start the switch in the same mode as the original script
+        /* EXACT zoals origineel:
+           switch start in active mode → slider staat rechts en is goed zichtbaar */
         switchEl.classList.add("active");
 
-        // Toggle only affects the slider movement
+        /* Alleen toggle movement */
         switchEl.addEventListener("click", () => {
             switchEl.classList.toggle("active");
         });
-
-        // Light mode tint
-        if (forcedMode === "light") {
-            bar.style.background = "#f9f9f9";
-            const slider = bar.querySelector(".slider");
-            if (slider) {
-                slider.style.background = "#f9f9f9";
-                slider.style.borderColor = "#ccc";
-            }
-        }
 
         requestAnimationFrame(() => {
             bar.style.opacity = 1;
@@ -118,16 +106,10 @@
     }
 
     /* --------------------------------------------
-    INIT (Minimal forcedMode detection stays)
+    INIT
     -------------------------------------------- */
     document.addEventListener("DOMContentLoaded", () => {
-        const bodyStyles = getComputedStyle(document.body);
-        const currentBg = bodyStyles.backgroundColor.trim();
-
-        // original logic: detect dark/light
-        let forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
-
-        initToggleBar(forcedMode);
+        initToggleBar();
     });
 
 })();
