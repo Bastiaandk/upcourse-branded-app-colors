@@ -1,7 +1,7 @@
 (function () {
 
     /* --------------------------------------------
-    CSS (zonder wijzigingen)
+    CSS (origineel)
     -------------------------------------------- */
     function injectToggleCSS() {
         const css = `
@@ -53,7 +53,7 @@
     }
 
     /* --------------------------------------------
-    HTML
+    HTML (origineel)
     -------------------------------------------- */
     function injectToggleHTML() {
         const bar = document.createElement("div");
@@ -61,7 +61,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 1 🎨</span>
+                <span style="font-size:22px;">debug 2 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch">
                     <div class="slider"></div>
@@ -75,7 +75,7 @@
     }
 
     /* --------------------------------------------
-    snapshotStyles (geen writes)
+    snapshotStyles (nodig voor applySnapshot)
     -------------------------------------------- */
     const SELECTOR_LIST =
         'div,section,article,header,footer,main,aside,' +
@@ -85,12 +85,13 @@
         'img,button,label,[style]';
 
     let elementsCache = [];
-    const snapshotMap = new WeakMap();
+    const originalStyles = new WeakMap();
+    const forcedStyles = new WeakMap();
 
-    function snapshotStyles() {
+    function snapshotStyles(targetMap) {
         elementsCache.forEach((el) => {
             const cs = getComputedStyle(el);
-            snapshotMap.set(el, {
+            targetMap.set(el, {
                 color: cs.color,
                 bg: cs.backgroundColor,
                 inlineColor: el.style.color || null,
@@ -100,16 +101,24 @@
     }
 
     /* --------------------------------------------
-    fixVideoBackgrounds
+    applySnapshot ONLY
     -------------------------------------------- */
-    const VIDEO_SELECTOR =
-        '.block-type--video, .block-type--video *,' +
-        '.block-type--gamify_video, .block-type--gamify_video *';
+    function applySnapshot(snapshotMap) {
+        elementsCache.forEach((el) => {
+            const saved = snapshotMap.get(el);
+            if (!saved) return;
 
-    function fixVideoBackgrounds() {
-        document.querySelectorAll(VIDEO_SELECTOR).forEach((el) => {
-            el.style.removeProperty("background");
-            el.style.removeProperty("background-color");
+            el.style.setProperty(
+                "color",
+                saved.inlineColor !== null ? saved.inlineColor : saved.color,
+                "important"
+            );
+
+            el.style.setProperty(
+                "background-color",
+                saved.inlineBg !== null ? saved.inlineBg : saved.bg,
+                "important"
+            );
         });
     }
 
@@ -129,16 +138,21 @@
         }
 
         const switchEl = bar.querySelector("#jiffy_switch");
+
         switchEl.classList.add("active");
 
         switchEl.addEventListener("click", () => {
             switchEl.classList.toggle("active");
 
-            // test only: snapshot + fixVideoBackgrounds
-            snapshotStyles();
-            fixVideoBackgrounds();
+            const isOn = switchEl.classList.contains("active");
 
-            console.log("Test #2: snapshotStyles + fixVideoBackgrounds executed");
+            if (isOn) {
+                applySnapshot(forcedStyles);
+                console.log("applySnapshot → forcedStyles");
+            } else {
+                applySnapshot(originalStyles);
+                console.log("applySnapshot → originalStyles");
+            }
         });
 
         requestAnimationFrame(() => {
@@ -152,10 +166,15 @@
     document.addEventListener("DOMContentLoaded", () => {
         elementsCache = Array.from(document.querySelectorAll(SELECTOR_LIST));
 
-        // eerste scan maar GEEN wijzigingen
-        snapshotStyles();
+        // eerste snapshots maken (zoals origineel)
+        snapshotStyles(originalStyles);
 
-        initToggleBar();
+        // forced snapshot maken (zoals origineel)
+        setTimeout(() => {
+            snapshotStyles(forcedStyles);
+
+            initToggleBar();
+        }, 500);
     });
 
 })();
