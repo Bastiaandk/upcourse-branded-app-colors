@@ -61,12 +61,12 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 2 🎨</span>
+                <span style="font-size:22px;">debug 3 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch"></div>
 
                 <!-- Icoon pas in phase 2 -->
-                <span id="jiffy_icon" style="font-size:22px;"></span>
+<span id="emoji_right" style="font-size:22px;">☾</span>
             </div>
         `;
 
@@ -101,13 +101,27 @@
 
     function applySnapshot(snapshotMap) {
         elementsCache.forEach((el) => {
+
+            // Skip the emoji icon → never apply snapshot to it
+            if (el.id === "emoji_right") return;
+
             const saved = snapshotMap.get(el);
             if (!saved) return;
 
-            el.style.setProperty("color", saved.inlineColor !== null ? saved.inlineColor : saved.color, "important");
-            el.style.setProperty("background-color", saved.inlineBg !== null ? saved.inlineBg : saved.bg, "important");
+            el.style.setProperty(
+                "color",
+                saved.inlineColor !== null ? saved.inlineColor : saved.color,
+                "important"
+            );
+
+            el.style.setProperty(
+                "background-color",
+                saved.inlineBg !== null ? saved.inlineBg : saved.bg,
+                "important"
+            );
         });
     }
+
 
     /* --------------------------------------------
     PHASE 1 — EARLY BAR (GEEN SLIDER, GEEN ICON)
