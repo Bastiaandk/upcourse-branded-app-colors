@@ -62,7 +62,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 🎨</span>
+                <span style="font-size:22px;">debug 2 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch">
                     <div class="slider"></div> 
@@ -179,6 +179,13 @@
                 applySnapshot(originalStyles);
             }
         });
+
+        // HARD FIX: slider permanent zichtbaar houden
+        slider.style.setProperty("background-color", "#444", "important");
+        slider.style.setProperty("border", "1px solid #222", "important");
+        slider.style.setProperty("visibility", "visible", "important");
+
+
     }
 
     /* --------------------------------------------
