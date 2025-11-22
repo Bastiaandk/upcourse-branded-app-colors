@@ -1,7 +1,7 @@
 (function () {
 
     /* --------------------------------------------
-    CSS (origineel, maar slider is eerst hidden)
+    CSS (origineel, zonder slider visible in fase 1)
     -------------------------------------------- */
     function injectToggleCSS() {
         const css = `
@@ -32,16 +32,15 @@
             overflow: hidden;
         }
 
+        /* Nog GEEN slider in fase 1 */
         #jiffy_switch .slider {
             position: absolute;
             top: 3px;
             left: 3px;
             width: 22px;
             height: 22px;
-            background: #444 !important;
             border-radius: 50%;
             transition: transform 0.25s ease;
-            visibility: visible !important;
         }
 
         #jiffy_switch.active .slider {
@@ -54,7 +53,7 @@
     }
 
     /* --------------------------------------------
-    HTML BAR
+    HTML BAR — SLIDER IS HIER WEGGELATEN!
     -------------------------------------------- */
     function injectToggleHTML() {
         const bar = document.createElement("div");
@@ -62,11 +61,9 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 2 🎨</span>
+                <span style="font-size:22px;">debug 1 🎨</span>
 
-                <div id="jiffy_switch" aria-role="switch">
-                    <div class="slider"></div> 
-                </div>
+                <div id="jiffy_switch" aria-role="switch"></div>
 
                 <span style="font-size:22px;">☾</span>
             </div>
@@ -106,22 +103,13 @@
             const saved = snapshotMap.get(el);
             if (!saved) return;
 
-            el.style.setProperty(
-                "color",
-                saved.inlineColor !== null ? saved.inlineColor : saved.color,
-                "important"
-            );
-
-            el.style.setProperty(
-                "background-color",
-                saved.inlineBg !== null ? saved.inlineBg : saved.bg,
-                "important"
-            );
+            el.style.setProperty("color", saved.inlineColor !== null ? saved.inlineColor : saved.color, "important");
+            el.style.setProperty("background-color", saved.inlineBg !== null ? saved.inlineBg : saved.bg, "important");
         });
     }
 
     /* --------------------------------------------
-    PHASE 1 — EARLY BAR (NO SLIDER FUNCTIONALITY)
+    PHASE 1 — EARLY BAR (NO SLIDER YET)
     -------------------------------------------- */
     function initBarEarly() {
         injectToggleCSS();
@@ -143,15 +131,22 @@
     }
 
     /* --------------------------------------------
-    PHASE 2 — LATE SLIDER ACTIVATION (NO SCROLL JUMP)
+    PHASE 2 — ADD SLIDER AFTER DUMP
     -------------------------------------------- */
     function activateSlider(bar) {
 
         const switchEl = bar.querySelector("#jiffy_switch");
-        const slider = bar.querySelector(".slider");
 
-        // make slider visible AFTER hydration
-        slider.style.visibility = "visible";
+        /* SLIDER WORDT HIER PAS GEMAAKT → NIET IN DE DUMP */
+        const slider = document.createElement("div");
+        slider.className = "slider";
+
+        /* Hard protections — Kajabi kan dit niet overschrijven */
+        slider.style.setProperty("background-color", "#444", "important");
+        slider.style.setProperty("border", "1px solid #222", "important");
+        slider.style.setProperty("visibility", "visible", "important");
+
+        switchEl.appendChild(slider);
 
         // determine forcedMode
         const bodyStyles = getComputedStyle(document.body);
@@ -160,8 +155,8 @@
 
         // tint slider (original behaviour)
         if (forcedMode === "light") {
-            slider.style.background = "#f9f9f9";
-            slider.style.borderColor = "#ccc";
+            slider.style.setProperty("background-color", "#f9f9f9", "important");
+            slider.style.setProperty("border-color", "#ccc", "important");
         }
 
         // start active like original
@@ -179,13 +174,6 @@
                 applySnapshot(originalStyles);
             }
         });
-
-        // HARD FIX: slider permanent zichtbaar houden
-        slider.style.setProperty("background-color", "#444", "important");
-        slider.style.setProperty("border", "1px solid #222", "important");
-        slider.style.setProperty("visibility", "visible", "important");
-
-
     }
 
     /* --------------------------------------------
@@ -200,13 +188,12 @@
         snapshotStyles(originalStyles);
 
         // Wait for Kajabi hydration to finish
-        // to avoid scroll bugs and slider invisibility
         setTimeout(() => {
 
             snapshotStyles(forcedStyles);
             activateSlider(bar);
 
-        }, 1000); // ← exact timing required
+        }, 1000);
     });
 
 })();
