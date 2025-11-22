@@ -139,11 +139,9 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">🎨</span>
+                <span id="emoji_left" style="font-size:22px;">debug v1 - 🎨</span>
 
-                <div id="jiffy_switch" aria-role="switch">
-                    <div class="slider"></div>
-                </div>
+
 
                 <span id="emoji_right" style="font-size:22px;">${emoji}</span>
             </div>
