@@ -1,5 +1,7 @@
 (function () {
-    // Inject minimal CSS
+    /* --------------------------------------------
+    MINIMAL CSS
+    -------------------------------------------- */
     function injectCSS() {
         const css = `
         #jiffy_toggle_bar {
@@ -25,6 +27,7 @@
             background: #111;
             border: 2px solid #444;
             border-radius: 20px;
+            cursor: pointer;
             overflow: hidden;
         }
 
@@ -36,6 +39,11 @@
             height: 22px;
             background: #444;
             border-radius: 50%;
+            transition: transform 0.25s ease;
+        }
+
+        #jiffy_switch.active .slider {
+            transform: translateX(28px);
         }
         `;
         const style = document.createElement("style");
@@ -43,17 +51,21 @@
         document.head.appendChild(style);
     }
 
-    // Inject minimal HTML
+    /* --------------------------------------------
+    MINIMAL HTML
+    -------------------------------------------- */
     function injectHTML() {
         const bar = document.createElement("div");
         bar.id = "jiffy_toggle_bar";
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug - stripped - 🎨</span>
-                <div id="jiffy_switch">
+                <span style="font-size:22px;">debug 🎨</span>
+
+                <div id="jiffy_switch" aria-role="switch">
                     <div class="slider"></div>
                 </div>
+
                 <span style="font-size:22px;">☾</span>
             </div>
         `;
@@ -65,13 +77,30 @@
             document.body.prepend(bar);
         }
 
+        return bar;
+    }
+
+    /* --------------------------------------------
+    TOGGLE ANIMATION ONLY (NO SIDE EFFECTS)
+    -------------------------------------------- */
+    function initToggle(bar) {
+        const switchEl = bar.querySelector("#jiffy_switch");
+
+        switchEl.addEventListener("click", () => {
+            switchEl.classList.toggle("active");
+        });
+
         requestAnimationFrame(() => {
             bar.style.opacity = 1;
         });
     }
 
+    /* --------------------------------------------
+    INIT
+    -------------------------------------------- */
     document.addEventListener("DOMContentLoaded", () => {
         injectCSS();
-        injectHTML();
+        const bar = injectHTML();
+        initToggle(bar);
     });
 })();
