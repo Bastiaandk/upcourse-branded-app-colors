@@ -78,7 +78,32 @@
     TOGGLE UI
     -------------------------------------------- */
 
+    function injectToggleCSS() {
+        const css = `
+        #xxxjiffy_toggle_bar {
+            position: static;
+            top: auto;
+            left: 0;
+            width: 100%;
+            background: #111;
+            padding: 5px 0;
+            z-index: 999999999;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
 
+        #jiffy_toggle_bar {
+            width: 100%;
+            padding: 5px 0;
+            background: #111;
+            transition: opacity 0.4s ease;
+        }
+
+        `;
+        const style = document.createElement('style');
+        style.textContent = css;
+        document.head.appendChild(style);
+    }
 
     function injectToggleHTML(forcedMode) {
         const bar = document.createElement('div');
@@ -88,7 +113,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">debug-v4-🎨</span>
+                <span id="emoji_left" style="font-size:22px;">debug-v3-🎨</span>
                 <label id="jiffy_switch">
                     <input type="checkbox" id="jiffy_mode_toggle" />
                     <span class="slider"></span>
