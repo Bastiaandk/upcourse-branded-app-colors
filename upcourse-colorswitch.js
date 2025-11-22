@@ -28,7 +28,7 @@
     SNAPSHOT
     -------------------------------------------- */
 
-    function snapshotStyles(targetMap) {
+    function xxxsnapshotStyles(targetMap) {
         elementsCache.forEach((el) => {
             const cs = getComputedStyle(el);
             targetMap.set(el, {
@@ -44,7 +44,7 @@
     APPLY SNAPSHOT
     -------------------------------------------- */
 
-    function applySnapshot(snapshotMap) {
+    function xxxapplySnapshot(snapshotMap) {
         elementsCache.forEach((el) => {
             const saved = snapshotMap.get(el);
             if (!saved) return;
@@ -67,7 +67,7 @@
     VIDEO FIX
     -------------------------------------------- */
 
-    function fixVideoBackgrounds() {
+    function xxxfixVideoBackgrounds() {
         document.querySelectorAll(VIDEO_SELECTOR).forEach((el) => {
             el.style.removeProperty("background");
             el.style.removeProperty("background-color");
@@ -139,7 +139,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">debug - 5 - 🎨</span>
+                <span id="emoji_left" style="font-size:22px;">debug - 6 - 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch">
                     <div class="slider"></div>
