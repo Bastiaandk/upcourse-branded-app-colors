@@ -49,14 +49,16 @@
             const saved = snapshotMap.get(el);
             if (!saved) return;
 
-            el.style.setProperty('color',
+            el.style.setProperty(
+                "color",
                 saved.inlineColor !== null ? saved.inlineColor : saved.color,
-                'important'
+                "important"
             );
 
-            el.style.setProperty('background-color',
+            el.style.setProperty(
+                "background-color",
                 saved.inlineBg !== null ? saved.inlineBg : saved.bg,
-                'important'
+                "important"
             );
         });
     }
@@ -67,8 +69,8 @@
 
     function fixVideoBackgrounds() {
         document.querySelectorAll(VIDEO_SELECTOR).forEach((el) => {
-            el.style.removeProperty('background');
-            el.style.removeProperty('background-color');
+            el.style.removeProperty("background");
+            el.style.removeProperty("background-color");
         });
     }
 
@@ -120,7 +122,7 @@
             transform: translateX(28px);
         }
         `;
-        const style = document.createElement('style');
+        const style = document.createElement("style");
         style.textContent = css;
         document.head.appendChild(style);
     }
@@ -130,14 +132,20 @@
     -------------------------------------------- */
 
     function injectToggleHTML(forcedMode) {
-        const bar = document.createElement('div');
-        bar.id = 'jiffy_toggle_bar';
+        const bar = document.createElement("div");
+        bar.id = "jiffy_toggle_bar";
 
-        const emoji = forcedMode === 'dark' ? '☾' : '𖤓';
+        const emoji = forcedMode === "dark" ? "☾" : "𖤓";
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-<p>123123123</p>
+                <span id="emoji_left" style="font-size:22px;">debug - 5 - 🎨</span>
+
+                <div id="jiffy_switch" aria-role="switch">
+                    <div class="slider"></div>
+                </div>
+
+                <span id="emoji_right" style="font-size:22px;">${emoji}</span>
             </div>
         `;
 
@@ -153,17 +161,25 @@
 
         const bar = injectToggleHTML(forcedMode);
 
-        /* SAFE INSERT */
-        const container = document.querySelector('.lessoncontainer');
-        container.insertBefore(bar, container.firstChild);
+        /* --------------------------------------------
+        SAFE REPLACE USING PLACEHOLDER
+        -------------------------------------------- */
+        const placeholder = document.getElementById("jiffy_bar_placeholder");
+
+        if (placeholder) {
+            placeholder.replaceWith(bar);
+        } else {
+            console.warn("Jiffy placeholder not found — fallback to prepend.");
+            document.body.prepend(bar);
+        }
 
         /* ---- NEW PURE-DIV SWITCH ---- */
-        const switchEl = bar.querySelector('#jiffy_switch');
-        switchEl.classList.add('active'); // start in forced mode
+        const switchEl = bar.querySelector("#jiffy_switch");
+        switchEl.classList.add("active"); // start in forced mode
 
-        switchEl.addEventListener('click', () => {
-            switchEl.classList.toggle('active');
-            const isOn = switchEl.classList.contains('active');
+        switchEl.addEventListener("click", () => {
+            switchEl.classList.toggle("active");
+            const isOn = switchEl.classList.contains("active");
 
             if (isOn) {
                 applySnapshot(forcedStyles);
@@ -174,12 +190,12 @@
         });
 
         /* Optional: Light mode tint */
-        if (forcedMode === 'light') {
-            bar.style.background = '#f9f9f9';
-            const slider = bar.querySelector('.slider');
+        if (forcedMode === "light") {
+            bar.style.background = "#f9f9f9";
+            const slider = bar.querySelector(".slider");
             if (slider) {
-                slider.style.background = '#f9f9f9';
-                slider.style.borderColor = '#ccc';
+                slider.style.background = "#f9f9f9";
+                slider.style.borderColor = "#ccc";
             }
         }
 
@@ -192,7 +208,7 @@
     INIT
     -------------------------------------------- */
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener("DOMContentLoaded", () => {
         elementsCache = Array.from(document.querySelectorAll(SELECTOR_LIST));
         originalBodyColor = getComputedStyle(document.body).color.trim();
 
@@ -200,18 +216,14 @@
 
         setTimeout(() => {
             const bodyStyles = getComputedStyle(document.body);
-
-            const currentColor = bodyStyles.color.trim();
             const currentBg = bodyStyles.backgroundColor.trim();
 
-            if (currentColor !== originalBodyColor) {
-                snapshotStyles(forcedStyles);
-                fixVideoBackgrounds();
+            snapshotStyles(forcedStyles);
+            fixVideoBackgrounds();
 
-                let forcedMode = currentBg.includes('16, 16, 16') ? 'dark' : 'light';
+            let forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
 
-                initToggleBar(forcedMode);
-            }
+            initToggleBar(forcedMode);
         }, 1000);
     });
 })();
