@@ -67,11 +67,11 @@
     VIDEO FIX
     -------------------------------------------- */
 
-    function xxxfixVideoBackgrounds() {
-        document.querySelectorAll(VIDEO_SELECTOR).forEach((el) => {
-            el.style.removeProperty("background");
-            el.style.removeProperty("background-color");
-        });
+    function fixVideoBackgrounds() {
+        //    document.querySelectorAll(VIDEO_SELECTOR).forEach((el) => {
+        //        el.style.removeProperty("background");
+        //        el.style.removeProperty("background-color");
+        //    });
     }
 
     /* --------------------------------------------
