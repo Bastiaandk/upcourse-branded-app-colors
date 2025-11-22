@@ -80,7 +80,7 @@
 
     function injectToggleCSS() {
         const css = `
-        #jiffy_toggle_bar {
+        #xxxjiffy_toggle_bar {
             position: static;
             top: auto;
             left: 0;
@@ -92,13 +92,15 @@
             transition: opacity 0.4s ease;
         }
 
-        /* Mobile: sticky so Safari stays smooth */
-        @media (max-width: 900px) {
-            #jiffy_toggle_bar {
-                position: sticky !important;
-                top: 0 !important;
-            }
-        }
+#jiffy_toggle_bar {
+    position: static;
+    width: 100%;
+    padding: 5px 0;
+    background: #111;
+}
+
+
+
 
         #jiffy_toggle_inner {
             display: flex;
@@ -158,7 +160,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">debug-v1-🎨</span>
+                <span id="emoji_left" style="font-size:22px;">debug-v2-🎨</span>
                 <label id="jiffy_switch">
                     <input type="checkbox" id="jiffy_mode_toggle" />
                     <span class="slider"></span>
