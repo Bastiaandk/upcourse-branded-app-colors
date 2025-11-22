@@ -63,7 +63,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 3 🎨</span>
+                <span style="font-size:22px;">debug 1 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch">
                     <div class="slider"></div>
@@ -77,7 +77,7 @@
     }
 
     /* --------------------------------------------
-    snapshotStyles
+    snapshot + apply
     -------------------------------------------- */
     const SELECTOR_LIST =
         'div,section,article,header,footer,main,aside,' +
@@ -102,9 +102,6 @@
         });
     }
 
-    /* --------------------------------------------
-    applySnapshot
-    -------------------------------------------- */
     function applySnapshot(snapshotMap) {
         elementsCache.forEach((el) => {
             const saved = snapshotMap.get(el);
@@ -125,9 +122,10 @@
     }
 
     /* --------------------------------------------
-    INIT BAR (gefixte versie)
+    INIT BAR — originele timing + sliderfix
     -------------------------------------------- */
     function initToggleBar(forcedMode) {
+
         injectToggleCSS();
 
         const bar = injectToggleHTML(forcedMode);
@@ -144,20 +142,17 @@
 
         switchEl.addEventListener("click", () => {
             switchEl.classList.toggle("active");
-
             const isOn = switchEl.classList.contains("active");
 
             if (isOn) {
                 applySnapshot(forcedStyles);
-                console.log("applySnapshot → forcedStyles");
             } else {
                 applySnapshot(originalStyles);
-                console.log("applySnapshot → originalStyles");
             }
         });
 
         /* --------------------------------------------
-           SLIDER FIX — exact zoals origineel bedoeld
+           SLIDER FIX — origineel gedrag precies hersteld
         -------------------------------------------- */
         if (forcedMode === "light") {
             const slider = bar.querySelector(".slider");
@@ -173,25 +168,27 @@
     }
 
     /* --------------------------------------------
-    INIT
+    INIT — ORIGINELE TIJD TERUG
     -------------------------------------------- */
     document.addEventListener("DOMContentLoaded", () => {
 
         elementsCache = Array.from(document.querySelectorAll(SELECTOR_LIST));
+
         snapshotStyles(originalStyles);
 
+        /* ★ DE CRUCIALE FIX ★  
+           WACHT LAAT GENOEG DAT KAJABI UITGEHYDRATE IS */
         setTimeout(() => {
 
-            // Originele detectie teruggeplaatst
+            snapshotStyles(forcedStyles);
+
             const bodyStyles = getComputedStyle(document.body);
             const currentBg = bodyStyles.backgroundColor.trim();
             const forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
 
-            snapshotStyles(forcedStyles);
-
             initToggleBar(forcedMode);
 
-        }, 500);
+        }, 1000); // ← DEZE timing maakte jouw slider zichtbaar
     });
 
 })();
