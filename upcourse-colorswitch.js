@@ -1,6 +1,6 @@
 (function () {
     /* --------------------------------------------
-    MINIMAL CSS
+    MINIMAL CSS (unchanged from original)
     -------------------------------------------- */
     function injectCSS() {
         const css = `
@@ -42,7 +42,6 @@
             transition: transform 0.25s ease;
         }
 
-        /* MOVEMENT */
         #jiffy_switch.active .slider {
             transform: translateX(28px);
         }
@@ -53,7 +52,7 @@
     }
 
     /* --------------------------------------------
-    MINIMAL HTML
+    HTML (same structure as original)
     -------------------------------------------- */
     function injectHTML() {
         const bar = document.createElement("div");
@@ -61,7 +60,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 2 🎨</span>
+                <span style="font-size:22px;">debug 🎨</span>
 
                 <div id="jiffy_switch" aria-role="switch">
                     <div class="slider"></div>
@@ -82,13 +81,14 @@
     }
 
     /* --------------------------------------------
-    ONLY UI ANIMATION (NO SIDE EFFECTS)
+    REAL WORKING TOGGLE (UI ONLY)
     -------------------------------------------- */
     function initToggle(bar) {
         const switchEl = bar.querySelector("#jiffy_switch");
 
-        // Make it start inactive
-        switchEl.classList.remove("active");
+        /* IMPORTANT: mimic original behavior
+           The switch starts as active in the original script. */
+        switchEl.classList.add("active");
 
         switchEl.addEventListener("click", () => {
             switchEl.classList.toggle("active");
