@@ -158,7 +158,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">🎨</span>
+                <span id="emoji_left" style="font-size:22px;">debug-v1-🎨</span>
                 <label id="jiffy_switch">
                     <input type="checkbox" id="jiffy_mode_toggle" />
                     <span class="slider"></span>
