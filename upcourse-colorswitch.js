@@ -296,7 +296,6 @@
             }
 
             snapshotStyles(forcedStyles);
-            fixVideoBackgrounds();
 
             const currentBg = bodyStyles.backgroundColor.trim();
             forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
@@ -307,6 +306,8 @@
 
             setTimeout(() => {
                 bar.style.display = "block";
+                fixVideoBackgrounds();
+
             }, 1250);
 
             const toggle = document.getElementById("jiffy_mode_toggle");
@@ -320,6 +321,8 @@
                 } else {
                     uiMode = "original";
                     applySnapshot(originalStyles);
+                    fixVideoBackgrounds();
+
                 }
 
                 applyForcedModeToBar();
