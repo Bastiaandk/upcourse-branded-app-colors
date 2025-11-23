@@ -301,7 +301,7 @@
             // Bar tonen
             setTimeout(() => {
                 bar.style.display = "block";
-            }, 1500);
+            }, 1000);
 
             // Toggle configureren
             const toggle = document.getElementById("jiffy_mode_toggle");
