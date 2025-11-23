@@ -23,7 +23,8 @@
     const forcedStyles = new WeakMap();
     let originalBodyColor = null;
     let elementsCache = [];
-    let forcedMode = null;   // "dark" or "light"
+    let forcedMode = null;     // "light" of "dark"
+    let uiMode = "forced";     // "forced" of "original"
 
     /* --------------------------------------------
     SNAPSHOTS
@@ -72,7 +73,7 @@
     }
 
     /* --------------------------------------------
-    CSS (Stap 1)
+    CSS (Light/Dark Classes)
     -------------------------------------------- */
 
     function injectToggleCSS() {
@@ -137,7 +138,7 @@
             transition: transform 0.25s ease, background-color 0.25s ease;
         }
 
-        /* VISUELE ACTIEVE SLIDER (rechts) */
+        /* SLIDER RECHTS = active (onze kleuren aan) */
         #jiffy_switch.active .slider::before {
             transform: translateX(28px);
         }
@@ -180,7 +181,7 @@
     }
 
     /* --------------------------------------------
-    EARLY HTML (Stap 2)
+    EARLY HTML
     -------------------------------------------- */
 
     function injectToggleHTML_EARLY() {
@@ -189,7 +190,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">debug - 2 - 🎨</span>
+                <span id="emoji_left" style="font-size:22px;">debug 🎨</span>
 
                 <label id="jiffy_switch">
                     <input type="checkbox" id="jiffy_mode_toggle" />
@@ -205,24 +206,29 @@
     }
 
     /* --------------------------------------------
-    APPLY MODE (Stap 3)
+    MODE APPLICATION
     -------------------------------------------- */
 
     function applyForcedModeToBar() {
         const bar = document.getElementById("jiffy_toggle_bar");
         const switchEl = document.getElementById("jiffy_switch");
-        const rightEmoji = document.getElementById("emoji_right");
+        const emoji = document.getElementById("emoji_right");
 
         bar.classList.remove("jiffy-light", "jiffy-dark");
 
         if (forcedMode === "dark") {
             bar.classList.add("jiffy-dark");
-            switchEl.classList.add("active");
-            rightEmoji.textContent = "☾";
+            emoji.textContent = "☾";
         } else {
             bar.classList.add("jiffy-light");
-            switchEl.classList.remove("active");
-            rightEmoji.textContent = "𖤓";
+            emoji.textContent = "𖤓";
+        }
+
+        // Slider positiesysteem volgens jouw regels:
+        if (uiMode === "forced") {
+            switchEl.classList.add("active");    // altijd rechts
+        } else {
+            switchEl.classList.remove("active"); // altijd links
         }
     }
 
@@ -232,10 +238,11 @@
 
     document.addEventListener("DOMContentLoaded", () => {
 
-        injectToggleCSS();               // CSS direct
-        injectToggleHTML_EARLY();        // HTML direct
+        injectToggleCSS();
+        injectToggleHTML_EARLY();
 
         const bar = document.getElementById("jiffy_toggle_bar");
+
         requestAnimationFrame(() => {
             bar.style.opacity = 1;
         });
@@ -244,8 +251,9 @@
         originalBodyColor = getComputedStyle(document.body).color.trim();
         snapshotStyles(originalStyles);
 
-        /* WAIT FOR KAJABI – detect forced colors */
+        /* AFTER KAJABI */
         setTimeout(() => {
+
             const bodyStyles = getComputedStyle(document.body);
             const currentColor = bodyStyles.color.trim();
             const currentBg = bodyStyles.backgroundColor.trim();
@@ -255,24 +263,26 @@
                 snapshotStyles(forcedStyles);
                 fixVideoBackgrounds();
 
-                forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
+                forcedMode =
+                    currentBg.includes("16, 16, 16") ? "dark" : "light";
+
+                uiMode = "forced";  // altijd start op forced
 
                 applyForcedModeToBar();
 
-                /* Toggle event */
                 const toggle = document.getElementById("jiffy_mode_toggle");
-                toggle.checked = (forcedMode === "dark");
+                toggle.checked = true;  // forced = on
 
                 toggle.addEventListener("change", () => {
                     if (toggle.checked) {
+                        uiMode = "forced";
                         applySnapshot(forcedStyles);
-                        forcedMode = "dark";
+                        fixVideoBackgrounds();
                     } else {
+                        uiMode = "original";
                         applySnapshot(originalStyles);
-                        forcedMode = "light";
                     }
 
-                    fixVideoBackgrounds();
                     applyForcedModeToBar();
                 });
             }
