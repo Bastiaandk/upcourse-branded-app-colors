@@ -188,7 +188,7 @@
 
         bar.innerHTML = `
         <div id="jiffy_toggle_inner">
-            <span id="emoji_left" style="font-size:22px;">debug 6 - 🎨</span>
+            <span id="emoji_left" style="font-size:22px;">debug 2 - 🎨</span>
 
             <label id="jiffy_switch">
                 <input type="checkbox" id="jiffy_mode_toggle" />
@@ -213,23 +213,22 @@
         const switchEl = document.getElementById("jiffy_switch");
         const emoji = document.getElementById("emoji_right");
 
+        // Bar krijgt ALTIJD de kleuren van forcedMode
         bar.classList.remove("jiffy-light", "jiffy-dark");
+        bar.classList.add(forcedMode === "dark" ? "jiffy-dark" : "jiffy-light");
 
-        if (forcedMode === "dark") {
-            bar.classList.add("jiffy-dark");
-            emoji.textContent = "☾";
-        } else {
-            bar.classList.add("jiffy-light");
-            emoji.textContent = "𖤓";
-        }
+        // Emoji afhankelijk van mode
+        emoji.textContent = forcedMode === "dark" ? "☾" : "𖤓";
 
-        // Slider positiesysteem volgens jouw regels:
+        // Slider rechts = onze kleuren aan
         if (uiMode === "forced") {
-            switchEl.classList.add("active");    // altijd rechts
+            switchEl.classList.add("active");
         } else {
-            switchEl.classList.remove("active"); // altijd links
+            switchEl.classList.remove("active");
         }
     }
+
+
 
     /* --------------------------------------------
     INIT
@@ -246,7 +245,9 @@
         originalBodyColor = getComputedStyle(document.body).color.trim();
         snapshotStyles(originalStyles);
 
-        /* AFTER KAJABI */
+        /* --------------------------------------------
+           INTELLIGENTE KAJABI DARK/LIGHT DETECTIE
+        -------------------------------------------- */
         function waitForKajabiColors(callback) {
             const start = performance.now();
 
@@ -254,13 +255,13 @@
                 const bodyStyles = getComputedStyle(document.body);
                 const currentColor = bodyStyles.color.trim();
 
-                // Kajabi heeft kleuren aangepast → klaar
+                // Klaar → Kajabi heeft kleuren toegepast
                 if (currentColor !== originalBodyColor) {
                     callback(bodyStyles);
                     return;
                 }
 
-                // Safety timeout: 3000ms → dan beschouwen we het als "geen dark/light"
+                // Safety timeout (3 sec) → Kajabi heeft GEEN dark/light
                 if (performance.now() - start > 3000) {
                     callback(null);
                     return;
@@ -273,6 +274,56 @@
             check();
         }
 
+        /* --------------------------------------------
+           UITVOEREN ZODRA KAJABI GEREED IS
+        -------------------------------------------- */
+        waitForKajabiColors((bodyStyles) => {
+
+            // Geen dark/light → bar blijft verborgen
+            if (!bodyStyles) {
+                bar.style.display = "none";
+                return;
+            }
+
+            // WEL dark/light
+            snapshotStyles(forcedStyles);
+            fixVideoBackgrounds();
+
+            const currentBg = bodyStyles.backgroundColor.trim();
+            forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
+
+            uiMode = "forced"; // altijd starten in forced mode
+
+            // Bar kleuren toepassen
+            applyForcedModeToBar();
+
+            // Bar tonen (met jouw 1250ms)
+            setTimeout(() => {
+                bar.style.display = "block";
+            }, 1250);
+
+            // Toggle activeren
+            const toggle = document.getElementById("jiffy_mode_toggle");
+            toggle.checked = true;
+
+            toggle.addEventListener("change", () => {
+                if (toggle.checked) {
+                    uiMode = "forced";
+                    applySnapshot(forcedStyles);
+                    fixVideoBackgrounds();
+                } else {
+                    uiMode = "original";
+                    applySnapshot(originalStyles);
+                }
+
+                // Alleen sliderpositie/bar-mode
+                applyForcedModeToBar();
+            });
+
+        });
+
+
     });
+
 
 })();
