@@ -1,9 +1,8 @@
 (function () {
 
     /* --------------------------------------------
-    CONFIG
+    SELECTORS
     -------------------------------------------- */
-
     const SELECTOR_LIST =
         'div,section,article,header,footer,main,aside,' +
         'span,p,a,li,ul,ol,' +
@@ -29,6 +28,11 @@
 
     function snapshotStyles(targetMap) {
         elementsCache.forEach((el) => {
+
+            // Skip the toggle bar and everything inside it
+            if (el.id === "jiffy_toggle_bar") return;
+            if (el.closest && el.closest("#jiffy_toggle_bar")) return;
+
             const cs = getComputedStyle(el);
             targetMap.set(el, {
                 color: cs.color,
@@ -41,8 +45,10 @@
 
     function applySnapshot(snapshotMap) {
         elementsCache.forEach((el) => {
+
+            // Skip toggle bar
             if (el.id === "jiffy_toggle_bar") return;
-            if (el.closest("#jiffy_toggle_bar")) return;
+            if (el.closest && el.closest("#jiffy_toggle_bar")) return;
 
             const saved = snapshotMap.get(el);
             if (!saved) return;
@@ -52,6 +58,7 @@
                 saved.inlineColor !== null ? saved.inlineColor : saved.color,
                 "important"
             );
+
             el.style.setProperty(
                 "background-color",
                 saved.inlineBg !== null ? saved.inlineBg : saved.bg,
@@ -88,22 +95,14 @@
 
         /* LIGHT MODE */
         #jiffy_toggle_bar.jiffy-light {
-            background: #f9f9f9;
-            color: #222;
-        }
-        #jiffy_toggle_bar.jiffy-light #jiffy_switch .slider {
-            background: #444;
-            border: 1px solid #222;
+            background: #ffffff;
+            color: #222222;
         }
 
         /* DARK MODE */
         #jiffy_toggle_bar.jiffy-dark {
-            background: #111;
+            background: #111111;
             color: #f9f9f9;
-        }
-        #jiffy_toggle_bar.jiffy-dark #jiffy_switch .slider {
-            background: #eee;
-            border: 1px solid #666;
         }
 
         #jiffy_toggle_inner {
@@ -111,18 +110,20 @@
             align-items: center;
             justify-content: center;
             gap: 14px;
-            width: 100%;
         }
 
+        /* SWITCH OUTLINE */
         #jiffy_switch {
             position: relative;
             width: 60px;
             height: 30px;
             border-radius: 20px;
+            border: 2px solid currentColor;
             background: transparent;
             cursor: pointer;
         }
 
+        /* SLIDER BALL */
         #jiffy_switch .slider {
             position: absolute;
             top: 3px;
@@ -130,10 +131,11 @@
             width: 22px;
             height: 22px;
             border-radius: 50%;
+            background: currentColor;
             transition: transform 0.25s ease;
         }
 
-        /* ACTIVE = slider right side */
+        /* ACTIVE (slider right) */
         #jiffy_switch.active .slider {
             transform: translateX(28px);
         }
@@ -161,29 +163,31 @@
                 <span id="emoji_right" style="font-size:22px;">☾</span>
             </div>
         `;
-
         return bar;
     }
 
     /* --------------------------------------------
-    SET MODE CLASSES + SLIDER POSITION
+    APPLY MODE
     -------------------------------------------- */
-    function applyMode(bar, forcedMode) {
+    function applyMode(bar, mode) {
+        const toggle = bar.querySelector("#jiffy_switch");
+        const emoji = bar.querySelector("#emoji_right");
+
         bar.classList.remove("jiffy-light", "jiffy-dark");
 
-        if (forcedMode === "dark") {
+        if (mode === "dark") {
             bar.classList.add("jiffy-dark");
-            bar.querySelector("#jiffy_switch").classList.add("active");
-            bar.querySelector("#emoji_right").textContent = "☾";
+            toggle.classList.add("active");
+            emoji.textContent = "☾";
         } else {
             bar.classList.add("jiffy-light");
-            bar.querySelector("#jiffy_switch").classList.remove("active");
-            bar.querySelector("#emoji_right").textContent = "𖤓";
+            toggle.classList.remove("active");
+            emoji.textContent = "𖤓";
         }
     }
 
     /* --------------------------------------------
-    RESTORE SLIDER COLORS AFTER SNAPSHOT
+    RESTORE SLIDER AFTER SNAPSHOT
     -------------------------------------------- */
     function restoreSliderMode(bar, mode) {
         applyMode(bar, mode);
@@ -199,6 +203,9 @@
         const bar = injectToggleHTML();
         document.body.prepend(bar);
 
+        /* Push content down */
+        document.body.style.paddingTop = bar.offsetHeight + "px";
+
         /* Fade-in */
         requestAnimationFrame(() => {
             bar.style.opacity = 1;
@@ -209,7 +216,7 @@
         originalBodyColor = getComputedStyle(document.body).color.trim();
         snapshotStyles(originalStyles);
 
-        /* Delay for Kajabi's color dump */
+        /* Wait for Kajabi's dump */
         setTimeout(() => {
 
             const bodyStyles = getComputedStyle(document.body);
@@ -222,11 +229,12 @@
             snapshotStyles(forcedStyles);
             fixVideoBackgrounds();
 
-            /* Apply forced mode to bar */
+            /* Apply forced mode colors */
             applyMode(bar, forcedMode);
 
-            /* Toggle: apply snapshots + restore slider tint */
-            const toggle = document.querySelector("#jiffy_switch");
+            /* Toggle logic */
+            const toggle = bar.querySelector("#jiffy_switch");
+
             toggle.addEventListener("click", () => {
                 const isActive = toggle.classList.toggle("active");
 
@@ -239,7 +247,7 @@
                 }
             });
 
-        }, 1000);
+        }, 900); // 900ms is smoother than 1000ms
 
     });
 
