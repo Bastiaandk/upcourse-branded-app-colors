@@ -190,7 +190,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">debug 🎨</span>
+                <span id="emoji_left" style="font-size:22px;">debug 1 🎨</span>
 
                 <label id="jiffy_switch">
                     <input type="checkbox" id="jiffy_mode_toggle" />
@@ -202,7 +202,9 @@
         `;
 
         document.body.prepend(bar);
+        bar.style.display = "none";   // bar is standaard verborgen
         return bar;
+
     }
 
     /* --------------------------------------------
@@ -269,6 +271,8 @@
                 uiMode = "forced";  // altijd start op forced
 
                 applyForcedModeToBar();
+
+                bar.style.display = "block";   // bar nu tonen
 
                 const toggle = document.getElementById("jiffy_mode_toggle");
                 toggle.checked = true;  // forced = on
