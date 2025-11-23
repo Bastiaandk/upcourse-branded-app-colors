@@ -172,9 +172,6 @@
         #jiffy_toggle_bar.jiffy-dark #jiffy_switch .slider::before {
             background: #dddddd;
         }
-        #jiffy_toggle_bar.jiffy-hidden {
-            display: none !important;
-        }
         `;
         const style = document.createElement("style");
         style.textContent = css;
@@ -188,11 +185,10 @@
     function injectToggleHTML_EARLY() {
         const bar = document.createElement("div");
         bar.id = "jiffy_toggle_bar";
-        bar.className = "jiffy-hidden";
 
         bar.innerHTML = `
         <div id="jiffy_toggle_inner">
-            <span id="emoji_left" style="font-size:22px;">debug 5 - 🎨</span>
+            <span id="emoji_left" style="font-size:22px;">debug 6 - 🎨</span>
 
             <label id="jiffy_switch">
                 <input type="checkbox" id="jiffy_mode_toggle" />
@@ -269,7 +265,7 @@
 
                 applyForcedModeToBar();
 
-                bar.classList.remove("jiffy-hidden");
+                bar.style.display = "block";
 
                 const toggle = document.getElementById("jiffy_mode_toggle");
                 toggle.checked = true;  // forced = on
