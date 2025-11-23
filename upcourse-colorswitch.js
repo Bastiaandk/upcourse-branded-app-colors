@@ -188,7 +188,7 @@
 
         bar.innerHTML = `
         <div id="jiffy_toggle_inner">
-            <span id="emoji_left" style="font-size:22px;">debug 1 - 🎨</span>
+            <span id="emoji_left" style="font-size:22px;">debug 2 - 🎨</span>
 
             <label id="jiffy_switch">
                 <input type="checkbox" id="jiffy_mode_toggle" />
@@ -299,7 +299,9 @@
             applyForcedModeToBar();
 
             // Bar tonen
-            bar.style.display = "block";
+            setTimeout(() => {
+                bar.style.display = "block";
+            }, 300);
 
             // Toggle configureren
             const toggle = document.getElementById("jiffy_mode_toggle");
