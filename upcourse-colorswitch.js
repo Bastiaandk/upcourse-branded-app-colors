@@ -80,6 +80,7 @@
         const css = `
         /* BASIS BAR */
         #jiffy_toggle_bar {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
@@ -191,7 +192,7 @@
 
         bar.innerHTML = `
         <div id="jiffy_toggle_inner">
-            <span id="emoji_left" style="font-size:22px;">debug 4 - 🎨</span>
+            <span id="emoji_left" style="font-size:22px;">debug 5 - 🎨</span>
 
             <label id="jiffy_switch">
                 <input type="checkbox" id="jiffy_mode_toggle" />
