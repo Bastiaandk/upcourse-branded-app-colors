@@ -188,7 +188,7 @@
 
         bar.innerHTML = `
         <div id="jiffy_toggle_inner">
-            <span id="emoji_left" style="font-size:22px;">debug 4 - 🎨</span>
+            <span id="emoji_left" style="font-size:22px;">debug 6 - 🎨</span>
 
             <label id="jiffy_switch">
                 <input type="checkbox" id="jiffy_mode_toggle" />
@@ -246,9 +246,7 @@
         originalBodyColor = getComputedStyle(document.body).color.trim();
         snapshotStyles(originalStyles);
 
-        /* --------------------------------------------
-           INTELLIGENTE KAJABI DARK/LIGHT DETECTIE
-        -------------------------------------------- */
+        /* AFTER KAJABI */
         function waitForKajabiColors(callback) {
             const start = performance.now();
 
@@ -256,13 +254,13 @@
                 const bodyStyles = getComputedStyle(document.body);
                 const currentColor = bodyStyles.color.trim();
 
-                // Klaar → Kajabi heeft kleuren toegepast
+                // Kajabi heeft kleuren aangepast → klaar
                 if (currentColor !== originalBodyColor) {
                     callback(bodyStyles);
                     return;
                 }
 
-                // Safety timeout (3 sec) → Kajabi heeft GEEN dark/light
+                // Safety timeout: 3000ms → dan beschouwen we het als "geen dark/light"
                 if (performance.now() - start > 3000) {
                     callback(null);
                     return;
@@ -275,53 +273,6 @@
             check();
         }
 
-        /* --------------------------------------------
-           UITVOEREN ZODRA KAJABI GEREED IS
-        -------------------------------------------- */
-        waitForKajabiColors((bodyStyles) => {
-
-            // Geen dark/light → bar blijft verborgen
-            if (!bodyStyles) {
-                bar.style.display = "none";
-                return;
-            }
-
-            // WEL dark/light → forced mode toepassen
-            snapshotStyles(forcedStyles);
-            fixVideoBackgrounds();
-
-            const currentBg = bodyStyles.backgroundColor.trim();
-            forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
-
-            uiMode = "forced"; // begin altijd in forced mode
-
-            // Bar kleuren + slider positie instellen
-            applyForcedModeToBar();
-
-            // Bar tonen
-            setTimeout(() => {
-                bar.style.display = "block";
-            }, 1250);
-
-            // Toggle configureren
-            const toggle = document.getElementById("jiffy_mode_toggle");
-            toggle.checked = true;
-
-            toggle.addEventListener("change", () => {
-                if (toggle.checked) {
-                    uiMode = "forced";
-                    applySnapshot(forcedStyles);
-                    fixVideoBackgrounds();
-                } else {
-                    uiMode = "original";
-                    applySnapshot(originalStyles);
-                }
-
-                applyForcedModeToBar();
-            });
-        });
-
     });
-
 
 })();
