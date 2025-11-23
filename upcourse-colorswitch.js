@@ -87,8 +87,6 @@
             padding: 5px 0;
             z-index: 999999999;
             display: block;
-            opacity: 0;
-            transition: opacity 0.4s ease;
         }
 
         #jiffy_toggle_inner {
@@ -194,7 +192,7 @@
 
         bar.innerHTML = `
         <div id="jiffy_toggle_inner">
-            <span id="emoji_left" style="font-size:22px;">debug 2 - 🎨</span>
+            <span id="emoji_left" style="font-size:22px;">debug 3 - 🎨</span>
 
             <label id="jiffy_switch">
                 <input type="checkbox" id="jiffy_mode_toggle" />
