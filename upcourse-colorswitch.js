@@ -1,81 +1,9 @@
 (function () {
 
     /* --------------------------------------------
-    CSS (origineel, zonder slider zichtbaar in fase 1)
+    CONFIG
     -------------------------------------------- */
-    function injectToggleCSS() {
-        const css = `
-        #jiffy_toggle_bar {
-            width: 100%;
-            padding: 5px 0;
-            background: #111;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
 
-        #jiffy_toggle_inner {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            width: 100%;
-        }
-
-        #jiffy_switch {
-            position: relative;
-            width: 60px;
-            height: 30px;
-            background: #111;
-            border: 2px solid #444;
-            border-radius: 20px;
-            cursor: pointer;
-            overflow: hidden;
-        }
-
-        /* slider pas zichtbaar na phase 2 */
-        #jiffy_switch .slider {
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            transition: transform 0.25s ease;
-        }
-
-        #jiffy_switch.active .slider {
-            transform: translateX(28px);
-        }
-        `;
-        const style = document.createElement("style");
-        style.textContent = css;
-        document.head.appendChild(style);
-    }
-
-    /* --------------------------------------------
-    HTML BAR — SLIDER EN ICON KOMEN LATER
-    -------------------------------------------- */
-    function injectToggleHTML() {
-        const bar = document.createElement("div");
-        bar.id = "jiffy_toggle_bar";
-
-        bar.innerHTML = `
-            <div id="jiffy_toggle_inner">
-                <span style="font-size:22px;">debug 3 🎨</span>
-
-                <div id="jiffy_switch" aria-role="switch"></div>
-
-                <!-- Icoon pas in phase 2 -->
-<span id="emoji_right" style="font-size:22px;">☾</span>
-            </div>
-        `;
-
-        return bar;
-    }
-
-    /* --------------------------------------------
-    snapshot + apply
-    -------------------------------------------- */
     const SELECTOR_LIST =
         'div,section,article,header,footer,main,aside,' +
         'span,p,a,li,ul,ol,' +
@@ -83,9 +11,21 @@
         'strong,em,b,i,small,blockquote,mark,' +
         'img,button,label,[style]';
 
-    let elementsCache = [];
+    const VIDEO_SELECTOR =
+        '.block-type--video, .block-type--video *,' +
+        '.block-type--gamify_video, .block-type--gamify_video *';
+
+    /* --------------------------------------------
+    SNAPSHOT STORAGE
+    -------------------------------------------- */
     const originalStyles = new WeakMap();
     const forcedStyles = new WeakMap();
+    let elementsCache = [];
+    let originalBodyColor = null;
+
+    /* --------------------------------------------
+    SNAPSHOT LOGIC
+    -------------------------------------------- */
 
     function snapshotStyles(targetMap) {
         elementsCache.forEach((el) => {
@@ -101,9 +41,8 @@
 
     function applySnapshot(snapshotMap) {
         elementsCache.forEach((el) => {
-
-            // Skip the emoji icon → never apply snapshot to it
-            if (el.id === "emoji_right") return;
+            if (el.id === "jiffy_toggle_bar") return;
+            if (el.closest("#jiffy_toggle_bar")) return;
 
             const saved = snapshotMap.get(el);
             if (!saved) return;
@@ -113,7 +52,6 @@
                 saved.inlineColor !== null ? saved.inlineColor : saved.color,
                 "important"
             );
-
             el.style.setProperty(
                 "background-color",
                 saved.inlineBg !== null ? saved.inlineBg : saved.bg,
@@ -122,80 +60,133 @@
         });
     }
 
+    /* --------------------------------------------
+    VIDEO FIX
+    -------------------------------------------- */
+    function fixVideoBackgrounds() {
+        document.querySelectorAll(VIDEO_SELECTOR).forEach((el) => {
+            el.style.removeProperty('background');
+            el.style.removeProperty('background-color');
+        });
+    }
 
     /* --------------------------------------------
-    PHASE 1 — EARLY BAR (GEEN SLIDER, GEEN ICON)
+    CSS (CLASS-BASED THEMING)
     -------------------------------------------- */
-    function initBarEarly() {
-        injectToggleCSS();
-
-        const bar = injectToggleHTML();
-        const placeholder = document.getElementById("jiffy_bar_placeholder");
-
-        if (placeholder) {
-            placeholder.replaceWith(bar);
-        } else {
-            document.body.prepend(bar);
+    function injectToggleCSS() {
+        const css = `
+        #jiffy_toggle_bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 5px 0;
+            z-index: 999999999;
+            opacity: 0;
+            transition: opacity 0.4s ease;
         }
 
-        requestAnimationFrame(() => {
-            bar.style.opacity = 1;
-        });
+        /* LIGHT MODE */
+        #jiffy_toggle_bar.jiffy-light {
+            background: #f9f9f9;
+            color: #222;
+        }
+        #jiffy_toggle_bar.jiffy-light #jiffy_switch .slider {
+            background: #444;
+            border: 1px solid #222;
+        }
+
+        /* DARK MODE */
+        #jiffy_toggle_bar.jiffy-dark {
+            background: #111;
+            color: #f9f9f9;
+        }
+        #jiffy_toggle_bar.jiffy-dark #jiffy_switch .slider {
+            background: #eee;
+            border: 1px solid #666;
+        }
+
+        #jiffy_toggle_inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            width: 100%;
+        }
+
+        #jiffy_switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            border-radius: 20px;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        #jiffy_switch .slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            transition: transform 0.25s ease;
+        }
+
+        /* ACTIVE = slider right side */
+        #jiffy_switch.active .slider {
+            transform: translateX(28px);
+        }
+        `;
+        const style = document.createElement("style");
+        style.textContent = css;
+        document.head.appendChild(style);
+    }
+
+    /* --------------------------------------------
+    EARLY HTML INJECTION
+    -------------------------------------------- */
+    function injectToggleHTML() {
+        const bar = document.createElement("div");
+        bar.id = "jiffy_toggle_bar";
+
+        bar.innerHTML = `
+            <div id="jiffy_toggle_inner">
+                <span id="emoji_left" style="font-size:22px;">🎨</span>
+
+                <div id="jiffy_switch">
+                    <div class="slider"></div>
+                </div>
+
+                <span id="emoji_right" style="font-size:22px;">☾</span>
+            </div>
+        `;
 
         return bar;
     }
 
     /* --------------------------------------------
-    PHASE 2 — SLIDER + ICON NA DUMP TOEVOEGEN
+    SET MODE CLASSES + SLIDER POSITION
     -------------------------------------------- */
-    function activateSlider(bar) {
+    function applyMode(bar, forcedMode) {
+        bar.classList.remove("jiffy-light", "jiffy-dark");
 
-        const switchEl = bar.querySelector("#jiffy_switch");
-
-        /* SLIDER AANMAKEN (Buiten Kajabi dump) */
-        const slider = document.createElement("div");
-        slider.className = "slider";
-
-        slider.style.setProperty("background-color", "#444", "important");
-        slider.style.setProperty("border", "1px solid #222", "important");
-        slider.style.setProperty("visibility", "visible", "important");
-
-        switchEl.appendChild(slider);
-
-        /* forcedMode bepalen zoals origineel */
-        const bodyStyles = getComputedStyle(document.body);
-        const currentBg = bodyStyles.backgroundColor.trim();
-        const forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
-
-        /* SLIDER TINT */
-        if (forcedMode === "light") {
-            slider.style.setProperty("background-color", "#f9f9f9", "important");
-            slider.style.setProperty("border-color", "#ccc", "important");
+        if (forcedMode === "dark") {
+            bar.classList.add("jiffy-dark");
+            bar.querySelector("#jiffy_switch").classList.add("active");
+            bar.querySelector("#emoji_right").textContent = "☾";
+        } else {
+            bar.classList.add("jiffy-light");
+            bar.querySelector("#jiffy_switch").classList.remove("active");
+            bar.querySelector("#emoji_right").textContent = "𖤓";
         }
+    }
 
-        /* ICON (SUN/MOON) INZETTEN — NET ALS ORIGINEEL */
-        const iconEl = bar.querySelector("#jiffy_icon");
-        const emoji = forcedMode === "dark" ? "☾" : "𖤓";
-        iconEl.textContent = emoji;
-
-        // kleur hard vastzetten
-        iconEl.style.setProperty("color", forcedMode === "dark" ? "#ddd" : "#fff", "important");
-
-        /* ACTIVE MODE START (zoals origineel) */
-        switchEl.classList.add("active");
-
-        /* TOGGLE LOGICA (zoals origineel, zonder icon wissel) */
-        switchEl.addEventListener("click", () => {
-            switchEl.classList.toggle("active");
-
-            const isOn = switchEl.classList.contains("active");
-
-            if (isOn) {
-                applySnapshot(forcedStyles);
-            } else {
-                applySnapshot(originalStyles);
-            }
-        });
+    /* --------------------------------------------
+    RESTORE SLIDER COLORS AFTER SNAPSHOT
+    -------------------------------------------- */
+    function restoreSliderMode(bar, mode) {
+        applyMode(bar, mode);
     }
 
     /* --------------------------------------------
@@ -203,17 +194,53 @@
     -------------------------------------------- */
     document.addEventListener("DOMContentLoaded", () => {
 
-        const bar = initBarEarly();
+        /* Inject CSS + early bar */
+        injectToggleCSS();
+        const bar = injectToggleHTML();
+        document.body.prepend(bar);
 
+        /* Fade-in */
+        requestAnimationFrame(() => {
+            bar.style.opacity = 1;
+        });
+
+        /* Snapshot original */
         elementsCache = Array.from(document.querySelectorAll(SELECTOR_LIST));
+        originalBodyColor = getComputedStyle(document.body).color.trim();
         snapshotStyles(originalStyles);
 
+        /* Delay for Kajabi's color dump */
         setTimeout(() => {
 
+            const bodyStyles = getComputedStyle(document.body);
+            const currentBg = bodyStyles.backgroundColor.trim();
+
+            let forcedMode = "light";
+            if (currentBg.includes("16, 16, 16")) forcedMode = "dark";
+
+            /* Snapshot forced styles */
             snapshotStyles(forcedStyles);
-            activateSlider(bar);
+            fixVideoBackgrounds();
+
+            /* Apply forced mode to bar */
+            applyMode(bar, forcedMode);
+
+            /* Toggle: apply snapshots + restore slider tint */
+            const toggle = document.querySelector("#jiffy_switch");
+            toggle.addEventListener("click", () => {
+                const isActive = toggle.classList.toggle("active");
+
+                if (isActive) {
+                    applySnapshot(forcedStyles);
+                    restoreSliderMode(bar, forcedMode);
+                } else {
+                    applySnapshot(originalStyles);
+                    restoreSliderMode(bar, forcedMode);
+                }
+            });
 
         }, 1000);
+
     });
 
 })();
