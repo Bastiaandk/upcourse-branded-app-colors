@@ -190,24 +190,25 @@
     function injectToggleHTML_EARLY() {
         const bar = document.createElement("div");
         bar.id = "jiffy_toggle_bar";
+        bar.className = "jiffy-hidden";
 
         bar.innerHTML = `
-            <div id="jiffy_toggle_bar" class="jiffy-hidden">
-                <span id="emoji_left" style="font-size:22px;">debug 2 🎨</span>
+        <div id="jiffy_toggle_inner">
+            <span id="emoji_left" style="font-size:22px;">debug 2 - 🎨</span>
 
-                <label id="jiffy_switch">
-                    <input type="checkbox" id="jiffy_mode_toggle" />
-                    <span class="slider"></span>
-                </label>
+            <label id="jiffy_switch">
+                <input type="checkbox" id="jiffy_mode_toggle" />
+                <span class="slider"></span>
+            </label>
 
-                <span id="emoji_right" style="font-size:22px;">☾</span>
-            </div>
-        `;
+            <span id="emoji_right" style="font-size:22px;">☾</span>
+        </div>
+    `;
 
         document.body.prepend(bar);
         return bar;
-
     }
+
 
     /* --------------------------------------------
     MODE APPLICATION
@@ -219,7 +220,6 @@
         const emoji = document.getElementById("emoji_right");
 
         bar.classList.remove("jiffy-light", "jiffy-dark");
-        bar.classList.remove("jiffy-hidden");
 
         if (forcedMode === "dark") {
             bar.classList.add("jiffy-dark");
@@ -275,7 +275,7 @@
 
                 applyForcedModeToBar();
 
-                bar.style.display = "block";   // bar nu tonen
+                bar.classList.remove("jiffy-hidden");
 
                 const toggle = document.getElementById("jiffy_mode_toggle");
                 toggle.checked = true;  // forced = on
