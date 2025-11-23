@@ -154,7 +154,7 @@
 
         bar.innerHTML = `
             <div id="jiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">🎨</span>
+                <span id="emoji_left" style="font-size:22px;">debug - 🎨</span>
 
                 <div id="jiffy_switch">
                     <div class="slider"></div>
