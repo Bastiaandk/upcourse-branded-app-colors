@@ -174,6 +174,9 @@
         #jiffy_toggle_bar.jiffy-dark #jiffy_switch .slider::before {
             background: #dddddd;
         }
+        #jiffy_toggle_bar.jiffy-hidden {
+            display: none !important;
+        }
         `;
         const style = document.createElement("style");
         style.textContent = css;
@@ -189,8 +192,8 @@
         bar.id = "jiffy_toggle_bar";
 
         bar.innerHTML = `
-            <div id="jiffy_toggle_inner">
-                <span id="emoji_left" style="font-size:22px;">debug 1 🎨</span>
+            <div id="jiffy_toggle_bar" class="jiffy-hidden">
+                <span id="emoji_left" style="font-size:22px;">debug 2 🎨</span>
 
                 <label id="jiffy_switch">
                     <input type="checkbox" id="jiffy_mode_toggle" />
@@ -202,7 +205,6 @@
         `;
 
         document.body.prepend(bar);
-        bar.style.display = "none";   // bar is standaard verborgen
         return bar;
 
     }
@@ -217,6 +219,7 @@
         const emoji = document.getElementById("emoji_right");
 
         bar.classList.remove("jiffy-light", "jiffy-dark");
+        bar.classList.remove("jiffy-hidden");
 
         if (forcedMode === "dark") {
             bar.classList.add("jiffy-dark");
