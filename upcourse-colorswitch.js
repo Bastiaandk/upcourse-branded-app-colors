@@ -31,6 +31,7 @@
     -------------------------------------------- */
 
     function snapshotStyles(targetMap) {
+        if (el.id === "jiffy_toggle_bar" || el.closest("#jiffy_toggle_bar")) return;
         elementsCache.forEach((el) => {
             const cs = getComputedStyle(el);
             targetMap.set(el, {
@@ -43,6 +44,7 @@
     }
 
     function applySnapshot(snapshotMap) {
+        if (el.id === "jiffy_toggle_bar" || el.closest("#jiffy_toggle_bar")) return;
         elementsCache.forEach((el) => {
             const saved = snapshotMap.get(el);
             if (!saved) return;
@@ -188,7 +190,7 @@
 
         bar.innerHTML = `
         <div id="jiffy_toggle_inner">
-            <span id="emoji_left" style="font-size:22px;">debug 2 - 🎨</span>
+            <span id="emoji_left" style="font-size:22px;">debug 3 - 🎨</span>
 
             <label id="jiffy_switch">
                 <input type="checkbox" id="jiffy_mode_toggle" />
