@@ -86,7 +86,6 @@
             width: 100%;
             padding: 5px 0;
             z-index: 999999999;
-            display: block;
         }
 
         #jiffy_toggle_inner {
@@ -192,7 +191,7 @@
 
         bar.innerHTML = `
         <div id="jiffy_toggle_inner">
-            <span id="emoji_left" style="font-size:22px;">debug 3 - 🎨</span>
+            <span id="emoji_left" style="font-size:22px;">debug 4 - 🎨</span>
 
             <label id="jiffy_switch">
                 <input type="checkbox" id="jiffy_mode_toggle" />
@@ -245,10 +244,6 @@
         injectToggleHTML_EARLY();
 
         const bar = document.getElementById("jiffy_toggle_bar");
-
-        requestAnimationFrame(() => {
-            bar.style.opacity = 1;
-        });
 
         elementsCache = Array.from(document.querySelectorAll(SELECTOR_LIST));
         originalBodyColor = getComputedStyle(document.body).color.trim();
