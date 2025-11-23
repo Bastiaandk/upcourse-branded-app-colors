@@ -188,7 +188,7 @@
 
         bar.innerHTML = `
         <div id="jiffy_toggle_inner">
-            <span id="emoji_left" style="font-size:22px;">debug 6 - 🎨</span>
+            <span id="emoji_left" style="font-size:22px;">debug - 🎨</span>
 
             <label id="jiffy_switch">
                 <input type="checkbox" id="jiffy_mode_toggle" />
@@ -247,43 +247,32 @@
         snapshotStyles(originalStyles);
 
         /* AFTER KAJABI */
-        setTimeout(() => {
+        function waitForKajabiColors(callback) {
+            const start = performance.now();
 
-            const bodyStyles = getComputedStyle(document.body);
-            const currentColor = bodyStyles.color.trim();
-            const currentBg = bodyStyles.backgroundColor.trim();
+            const check = () => {
+                const bodyStyles = getComputedStyle(document.body);
+                const currentColor = bodyStyles.color.trim();
 
-            if (currentColor !== originalBodyColor) {
+                // Kajabi heeft kleuren aangepast → klaar
+                if (currentColor !== originalBodyColor) {
+                    callback(bodyStyles);
+                    return;
+                }
 
-                snapshotStyles(forcedStyles);
-                fixVideoBackgrounds();
+                // Safety timeout: 3000ms → dan beschouwen we het als "geen dark/light"
+                if (performance.now() - start > 3000) {
+                    callback(null);
+                    return;
+                }
 
-                forcedMode =
-                    currentBg.includes("16, 16, 16") ? "dark" : "light";
+                // Nog niet klaar → opnieuw checken
+                requestAnimationFrame(check);
+            };
 
-                uiMode = "forced";  // altijd start op forced
+            check();
+        }
 
-                applyForcedModeToBar();
-
-                bar.style.display = "block";
-
-                const toggle = document.getElementById("jiffy_mode_toggle");
-                toggle.checked = true;  // forced = on
-
-                toggle.addEventListener("change", () => {
-                    if (toggle.checked) {
-                        uiMode = "forced";
-                        applySnapshot(forcedStyles);
-                        fixVideoBackgrounds();
-                    } else {
-                        uiMode = "original";
-                        applySnapshot(originalStyles);
-                    }
-
-                    applyForcedModeToBar();
-                });
-            }
-        }, 1000);
     });
 
 })();
