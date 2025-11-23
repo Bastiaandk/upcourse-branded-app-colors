@@ -1,8 +1,8 @@
 (function () {
 
-    /* --------------------------------------------
-    CONFIG
-    -------------------------------------------- */
+    /* -------------------------------------------------
+       CONFIGURATION
+    ------------------------------------------------- */
 
     const SELECTOR_LIST =
         'div,section,article,header,footer,main,aside,' +
@@ -15,25 +15,31 @@
         '.block-type--video, .block-type--video *,' +
         '.block-type--gamify_video, .block-type--gamify_video *';
 
-    /* --------------------------------------------
-    STORAGE
-    -------------------------------------------- */
+
+    /* -------------------------------------------------
+       STYLE STORAGE
+    ------------------------------------------------- */
 
     const originalStyles = new WeakMap();
     const forcedStyles = new WeakMap();
     let originalBodyColor = null;
     let elementsCache = [];
-    let forcedMode = null;     // "light" of "dark"
-    let uiMode = "forced";     // "forced" of "original"
+    let forcedMode = null;   // "light" or "dark"
+    let uiMode = "forced";   // "forced" or "original"
 
-    /* --------------------------------------------
-    SNAPSHOTS
-    -------------------------------------------- */
+
+    /* -------------------------------------------------
+       SNAPSHOT: Save all page colors except toggle bar
+    ------------------------------------------------- */
 
     function snapshotStyles(targetMap) {
         elementsCache.forEach((el) => {
+
+            // Never snapshot the toggle bar or its children
             if (el.id === "jiffy_toggle_bar" || el.closest("#jiffy_toggle_bar")) return;
+
             const cs = getComputedStyle(el);
+
             targetMap.set(el, {
                 color: cs.color,
                 bg: cs.backgroundColor,
@@ -43,9 +49,17 @@
         });
     }
 
+
+    /* -------------------------------------------------
+       APPLY SNAPSHOT: Restore saved colors to page
+    ------------------------------------------------- */
+
     function applySnapshot(snapshotMap) {
         elementsCache.forEach((el) => {
+
+            // Never override the toggle bar's CSS class colors
             if (el.id === "jiffy_toggle_bar" || el.closest("#jiffy_toggle_bar")) return;
+
             const saved = snapshotMap.get(el);
             if (!saved) return;
 
@@ -63,9 +77,10 @@
         });
     }
 
-    /* --------------------------------------------
-    VIDEO FIX
-    -------------------------------------------- */
+
+    /* -------------------------------------------------
+       VIDEO FIX: Remove unwanted backgrounds from players
+    ------------------------------------------------- */
 
     function fixVideoBackgrounds() {
         document.querySelectorAll(VIDEO_SELECTOR).forEach((el) => {
@@ -74,13 +89,13 @@
         });
     }
 
-    /* --------------------------------------------
-    CSS (Light/Dark Classes)
-    -------------------------------------------- */
+
+    /* -------------------------------------------------
+       CSS INJECTION: Light/Dark Bar Styling
+    ------------------------------------------------- */
 
     function injectToggleCSS() {
         const css = `
-        /* BASIS BAR */
         #jiffy_toggle_bar {
             display: none;
             position: fixed;
@@ -99,7 +114,6 @@
             width: 100%;
         }
 
-        /* SWITCH BASIS */
         #jiffy_switch {
             position: relative;
             width: 60px;
@@ -138,12 +152,10 @@
             transition: transform 0.25s ease, background-color 0.25s ease;
         }
 
-        /* SLIDER RECHTS = active (onze kleuren aan) */
         #jiffy_switch.active .slider::before {
             transform: translateX(28px);
         }
 
-        /* LIGHT MODE */
         #jiffy_toggle_bar.jiffy-light {
             background: #ffffff;
             color: #111111;
@@ -159,7 +171,6 @@
             background: #444444;
         }
 
-        /* DARK MODE */
         #jiffy_toggle_bar.jiffy-dark {
             background: #111111;
             color: #ffffff;
@@ -180,9 +191,10 @@
         document.head.appendChild(style);
     }
 
-    /* --------------------------------------------
-    EARLY HTML
-    -------------------------------------------- */
+
+    /* -------------------------------------------------
+       HTML INJECTION: Insert toggle bar early in DOM
+    ------------------------------------------------- */
 
     function injectToggleHTML_EARLY() {
         const bar = document.createElement("div");
@@ -190,7 +202,7 @@
 
         bar.innerHTML = `
         <div id="jiffy_toggle_inner">
-            <span id="emoji_left" style="font-size:22px;">debug 3 - 🎨</span>
+            <span id="emoji_left" style="font-size:22px;">🎨</span>
 
             <label id="jiffy_switch">
                 <input type="checkbox" id="jiffy_mode_toggle" />
@@ -199,30 +211,27 @@
 
             <span id="emoji_right" style="font-size:22px;">☾</span>
         </div>
-    `;
+        `;
 
         document.body.prepend(bar);
         return bar;
     }
 
 
-    /* --------------------------------------------
-    MODE APPLICATION
-    -------------------------------------------- */
+    /* -------------------------------------------------
+       APPLY FORCED MODE: Set bar styling + slider position
+    ------------------------------------------------- */
 
     function applyForcedModeToBar() {
         const bar = document.getElementById("jiffy_toggle_bar");
         const switchEl = document.getElementById("jiffy_switch");
         const emoji = document.getElementById("emoji_right");
 
-        // Bar krijgt ALTIJD de kleuren van forcedMode
         bar.classList.remove("jiffy-light", "jiffy-dark");
         bar.classList.add(forcedMode === "dark" ? "jiffy-dark" : "jiffy-light");
 
-        // Emoji afhankelijk van mode
         emoji.textContent = forcedMode === "dark" ? "☾" : "𖤓";
 
-        // Slider rechts = onze kleuren aan
         if (uiMode === "forced") {
             switchEl.classList.add("active");
         } else {
@@ -231,10 +240,9 @@
     }
 
 
-
-    /* --------------------------------------------
-    INIT
-    -------------------------------------------- */
+    /* -------------------------------------------------
+       INITIALIZATION
+    ------------------------------------------------- */
 
     document.addEventListener("DOMContentLoaded", () => {
 
@@ -247,9 +255,11 @@
         originalBodyColor = getComputedStyle(document.body).color.trim();
         snapshotStyles(originalStyles);
 
-        /* --------------------------------------------
-           INTELLIGENTE KAJABI DARK/LIGHT DETECTIE
-        -------------------------------------------- */
+
+        /* -------------------------------------------------
+           WAIT FOR KAJABI THEME COLORS (Dark/Light Detect)
+        ------------------------------------------------- */
+
         function waitForKajabiColors(callback) {
             const start = performance.now();
 
@@ -257,54 +267,48 @@
                 const bodyStyles = getComputedStyle(document.body);
                 const currentColor = bodyStyles.color.trim();
 
-                // Klaar → Kajabi heeft kleuren toegepast
                 if (currentColor !== originalBodyColor) {
                     callback(bodyStyles);
                     return;
                 }
 
-                // Safety timeout (3 sec) → Kajabi heeft GEEN dark/light
                 if (performance.now() - start > 3000) {
                     callback(null);
                     return;
                 }
 
-                // Nog niet klaar → opnieuw checken
                 requestAnimationFrame(check);
             };
 
             check();
         }
 
-        /* --------------------------------------------
-           UITVOEREN ZODRA KAJABI GEREED IS
-        -------------------------------------------- */
+
+        /* -------------------------------------------------
+           APPLY MODE AFTER KAJABI IS READY
+        ------------------------------------------------- */
+
         waitForKajabiColors((bodyStyles) => {
 
-            // Geen dark/light → bar blijft verborgen
             if (!bodyStyles) {
                 bar.style.display = "none";
                 return;
             }
 
-            // WEL dark/light
             snapshotStyles(forcedStyles);
             fixVideoBackgrounds();
 
             const currentBg = bodyStyles.backgroundColor.trim();
             forcedMode = currentBg.includes("16, 16, 16") ? "dark" : "light";
 
-            uiMode = "forced"; // altijd starten in forced mode
+            uiMode = "forced";
 
-            // Bar kleuren toepassen
             applyForcedModeToBar();
 
-            // Bar tonen (met jouw 1250ms)
             setTimeout(() => {
                 bar.style.display = "block";
             }, 1250);
 
-            // Toggle activeren
             const toggle = document.getElementById("jiffy_mode_toggle");
             toggle.checked = true;
 
@@ -318,14 +322,11 @@
                     applySnapshot(originalStyles);
                 }
 
-                // Alleen sliderpositie/bar-mode
                 applyForcedModeToBar();
             });
 
         });
 
-
     });
-
 
 })();
