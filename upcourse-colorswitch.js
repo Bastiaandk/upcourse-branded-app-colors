@@ -31,8 +31,8 @@
     -------------------------------------------- */
 
     function snapshotStyles(targetMap) {
-        if (el.id === "jiffy_toggle_bar" || el.closest("#jiffy_toggle_bar")) return;
         elementsCache.forEach((el) => {
+            if (el.id === "jiffy_toggle_bar" || el.closest("#jiffy_toggle_bar")) return;
             const cs = getComputedStyle(el);
             targetMap.set(el, {
                 color: cs.color,
@@ -44,8 +44,8 @@
     }
 
     function applySnapshot(snapshotMap) {
-        if (el.id === "jiffy_toggle_bar" || el.closest("#jiffy_toggle_bar")) return;
         elementsCache.forEach((el) => {
+            if (el.id === "jiffy_toggle_bar" || el.closest("#jiffy_toggle_bar")) return;
             const saved = snapshotMap.get(el);
             if (!saved) return;
 
