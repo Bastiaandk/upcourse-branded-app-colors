@@ -96,6 +96,8 @@
 
     function injectToggleCSS() {
         const css = `
+        .lessoncontainer {padding-top: 100px;}
+
         #jiffy_toggle_bar {
             display: none;
             position: fixed;
