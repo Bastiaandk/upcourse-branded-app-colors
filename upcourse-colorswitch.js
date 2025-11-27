@@ -96,6 +96,9 @@
 
     function injectToggleCSS() {
         const css = `
+        .lessoncontainer.jiffy-has-toggle {
+            padding-top: 40px;
+        }
         #jiffy_toggle_bar {
             display: none;
             position: fixed;
@@ -293,6 +296,11 @@
             if (!bodyStyles) {
                 bar.style.display = "none";
                 return;
+            }
+
+            const container = document.querySelector(".lessoncontainer");
+            if (container) {
+                container.classList.add("jiffy-has-toggle");
             }
 
             snapshotStyles(forcedStyles);
