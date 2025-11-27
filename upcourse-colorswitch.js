@@ -107,6 +107,7 @@
             width: 100%;
             padding: 5px 0;
             z-index: 999999999;
+            margin-bottom: 100px;
         }
 
         #jiffy_toggle_inner {
@@ -217,11 +218,6 @@
         `;
 
         document.body.prepend(bar);
-
-        const container = document.querySelector(".lessoncontainer");
-        if (container) {
-            container.classList.add("jiffy-has-toggle");
-        }
 
         return bar;
     }
