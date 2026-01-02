@@ -1,5 +1,10 @@
+/* -------------------------------------------------
+   UpCourse Color Switcher
+   - Forces Kajabi themes into Light or Dark mode
+   - Adds a toggle bar to switch between Forced and Original modes
+   - Fixes video backgrounds for better visibility
+------------------------------------------------- */
 (function () {
-
     /* -------------------------------------------------
        CONFIGURATION
     ------------------------------------------------- */
@@ -340,4 +345,60 @@
 
     });
 
+})();
+/* -------------------------------------------------
+   UpCourse Secondary Wistia Fix
+   - Fixes layout issues with secondary Wistia embeds
+------------------------------------------------- */
+(function () {
+  function fixSecondaryWistia() {
+    document
+      .querySelectorAll(
+        '.lessoncontainer [data-secondary="true"] .wistia_embed'
+      )
+      .forEach(embed => {
+        if (embed.dataset.wistiaFixed === 'true') return;
+        embed.dataset.wistiaFixed = 'true';
+
+        // Force layout omhoog (werkt voor video én audio)
+        let el = embed;
+        let i = 0;
+
+        while (el && i < 10) {
+          el.style.display = 'block';
+          el.style.visibility = 'visible';
+
+          // audio heeft expliciet min-height nodig
+          if (el.offsetHeight === 0) {
+            el.style.height = 'auto';
+            el.style.minHeight = '200px';
+          }
+
+          el = el.parentElement;
+          i++;
+        }
+
+        // Eénmalige reinsert → triggert Wistia correct
+        const parent = embed.parentElement;
+        const next = embed.nextSibling;
+        parent.removeChild(embed);
+        next ? parent.insertBefore(embed, next) : parent.appendChild(embed);
+
+        console.log('✅ Secondary Wistia fixed:', embed.id);
+      });
+  }
+
+  // Init timings (Kajabi + Wistia async)
+  setTimeout(fixSecondaryWistia, 600);
+  setTimeout(fixSecondaryWistia, 1400);
+
+  // Observeer late injecties (veilig)
+  const target = document.querySelector('.lessoncontainer');
+  if (!target) return;
+
+  const obs = new MutationObserver(fixSecondaryWistia);
+  obs.observe(target, { childList: true, subtree: true });
+
+  // Opruimen
+  setTimeout(() => obs.disconnect(), 6000);
 })();
