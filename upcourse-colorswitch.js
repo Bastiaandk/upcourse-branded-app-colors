@@ -346,9 +346,11 @@
     });
 
 })();
+
 /* -------------------------------------------------
-   UpCourse Secondary Wistia Fix
+   UpCourse Secondary Wistia Fix (SAFE)
    - Fixes layout issues with secondary Wistia embeds
+   - Stops at .block-type--video
 ------------------------------------------------- */
 (function () {
   function fixSecondaryWistia() {
@@ -360,31 +362,38 @@
         if (embed.dataset.wistiaFixed === 'true') return;
         embed.dataset.wistiaFixed = 'true';
 
-        // Force layout omhoog (werkt voor video én audio)
         let el = embed;
-        let i = 0;
 
-        while (el && i < 10) {
-          el.style.display = 'block';
-          el.style.visibility = 'visible';
+        while (el) {
+          // ✅ stop bij functionele container
+          if (el.classList?.contains('block-type--video')) break;
 
-          // audio heeft expliciet min-height nodig
-          if (el.offsetHeight === 0) {
-            el.style.height = 'auto';
-            el.style.minHeight = '200px';
+          // Alleen content-wrappers corrigeren
+          if (
+            el.classList?.contains('wistia_embed') ||
+            el.classList?.contains('kjb-video-responsive') ||
+            el.classList?.contains('video')
+          ) {
+            el.style.visibility = 'visible';
+
+            // audio fix: reserveer hoogte als Wistia instort
+            if (el.offsetHeight === 0) {
+              el.style.minHeight = '200px';
+            }
           }
 
           el = el.parentElement;
-          i++;
         }
 
-        // Eénmalige reinsert → triggert Wistia correct
+        // Eénmalige reinsert → Wistia herkent layout correct
         const parent = embed.parentElement;
-        const next = embed.nextSibling;
-        parent.removeChild(embed);
-        next ? parent.insertBefore(embed, next) : parent.appendChild(embed);
+        if (parent) {
+          const next = embed.nextSibling;
+          parent.removeChild(embed);
+          next ? parent.insertBefore(embed, next) : parent.appendChild(embed);
+        }
 
-        console.log('✅ Secondary Wistia fixed:', embed.id);
+        console.log('✅ Secondary Wistia fixed (safe):', embed.id);
       });
   }
 
@@ -392,11 +401,22 @@
   setTimeout(fixSecondaryWistia, 600);
   setTimeout(fixSecondaryWistia, 1400);
 
-  // Observeer late injecties (veilig)
+  // Observeer alleen echte DOM-mutaties
   const target = document.querySelector('.lessoncontainer');
   if (!target) return;
 
-  const obs = new MutationObserver(fixSecondaryWistia);
+  const obs = new MutationObserver(mutations => {
+    if (
+      mutations.some(m =>
+        [...m.addedNodes].some(
+          n => n.nodeType === 1 && n.querySelector?.('.wistia_embed')
+        )
+      )
+    ) {
+      fixSecondaryWistia();
+    }
+  });
+
   obs.observe(target, { childList: true, subtree: true });
 
   // Opruimen
